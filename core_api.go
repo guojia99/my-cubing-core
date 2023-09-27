@@ -34,7 +34,7 @@ func (c *Client) reloadCache() {
 // score Core
 
 func (c *Client) AddScore(req AddScoreRequest) error {
-	if err := c.addScore(req.playerID, req.contestID, req.project, req.roundId, req.result, req.penalty); err != nil {
+	if err := c.addScore(req.PlayerID, req.ContestID, req.Project, req.RoundId, req.Result, req.Penalty); err != nil {
 		return err
 	}
 	c.reloadCache()

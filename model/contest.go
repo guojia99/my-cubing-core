@@ -12,6 +12,12 @@ import (
 	json "github.com/json-iterator/go"
 )
 
+const (
+	OnLine          = "online"
+	offline         = "offline"
+	OfficialOffline = "official"
+)
+
 // Contest 比赛表，记录某场比赛
 type Contest struct {
 	Model

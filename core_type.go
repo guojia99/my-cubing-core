@@ -8,12 +8,12 @@ import (
 
 type (
 	AddScoreRequest struct {
-		playerID  uint
-		contestID uint
-		project   model.Project
-		roundId   uint
-		result    []float64
-		penalty   model.ScorePenalty
+		PlayerID  uint
+		ContestID uint
+		Project   model.Project
+		RoundId   uint
+		Result    []float64
+		Penalty   model.ScorePenalty
 	}
 
 	CreateContestRequestRound struct {
