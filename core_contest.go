@@ -28,8 +28,8 @@ var defaultProjectRounds = func() []CreateContestRequestRound {
 // addContest 添加一场比赛
 func (c *Client) addContest(req AddContestRequest) error {
 	var contest model.Contest
-	if err := c.db.Where("name = ?", req.Name).First(&contest).Error; err != nil {
-		return err
+	if err := c.db.Where("name = ?", req.Name).First(&contest).Error; err == nil {
+		return errors.New("name error")
 	}
 
 	contest = model.Contest{

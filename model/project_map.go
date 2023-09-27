@@ -116,7 +116,7 @@ var projectsItems = []projectItem{
 	{Project: XCube27AlienRelayAll, Cn: "全项目连拧", RouteType: RouteType1rounds, IsWca: false},
 	{Project: XCube333Ghost, Cn: "鬼魔", RouteType: RouteType5RoundsAvgHT, IsWca: false},
 	{Project: XCube333ZongZi, Cn: "粽子魔方", RouteType: RouteType5RoundsAvgHT, IsWca: false},
-	{Project: Xcube333Clone, Cn: "三阶克隆", RouteType: RouteType3roundsBest, IsWca: false},
+	{Project: Xcube333Clone, Cn: "三阶克隆", RouteType: RouteType5RoundsAvgHT, IsWca: false},
 }
 
 var projectItemsMap = make(map[Project]projectItem, len(projectsItems))
