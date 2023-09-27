@@ -27,7 +27,7 @@ type Contest struct {
 	Description string    `json:"Description,omitempty" gorm:"not null;column:description"` // 描述
 	IsEnd       bool      `json:"IsEnd,omitempty" gorm:"null;column:is_end"`                // 是否已结束
 	RoundIds    string    `json:"RoundIds,omitempty" gorm:"column:round_ids"`               // 轮次ID
-	RoundIdsVal []uint    `json:"RoundIdsVal,omitempty" gorm:"-"`                           // 轮次ID实际内容
+	Rounds      []Round   `json:"Rounds" gorm:"-"`                                          // 预留
 	StartTime   time.Time `json:"StartTime,omitempty" gorm:"column:start_time"`             // 开始时间
 	EndTime     time.Time `json:"EndTime,omitempty" gorm:"column:end_time"`                 // 结束时间
 }
@@ -35,14 +35,16 @@ type Contest struct {
 func (c *Contest) GetRoundIds() []uint {
 	var out []uint
 	_ = json.UnmarshalFromString(c.RoundIds, &out)
-	c.RoundIdsVal = out
 	return out
 }
 
-func (c *Contest) SetRoundIds(in []uint) *Contest {
-	data, _ := json.MarshalToString(in)
+func (c *Contest) SetRoundIds(in []Round) *Contest {
+	var ids []uint
+	for _, val := range in {
+		ids = append(ids, val.ID)
+	}
+	data, _ := json.MarshalToString(ids)
 	c.RoundIds = data
-	c.RoundIdsVal = in
 	return c
 }
 

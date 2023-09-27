@@ -213,18 +213,17 @@ func (c *Client) RemoveContest(contestId uint) error {
 	return nil
 }
 
-func (c *Client) GetContest(contestId uint) (contest model.Contest, rounds []model.Round, err error) {
+func (c *Client) GetContest(contestId uint) (contest model.Contest, err error) {
 	key := fmt.Sprintf("GetContest_%v", contestId)
 	if val, ok := c.cache.Get(key); ok && !c.debug {
-		result := val.([2]any)
-		return result[0].(model.Contest), result[1].([]model.Round), nil
+		return val.(model.Contest), nil
 	}
 
-	contest, rounds, err = c.getContest(contestId)
+	contest, err = c.getContest(contestId)
 	if err != nil {
 		return
 	}
-	_ = c.cache.Add(key, [2]any{contest, rounds}, c.cacheTime)
+	_ = c.cache.Add(key, contest, c.cacheTime)
 	return
 }
 

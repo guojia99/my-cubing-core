@@ -57,7 +57,7 @@ func (c *Client) addContest(req AddContestRequest) error {
 	if len(req.Rounds) == 0 || req.Rounds == nil {
 		req.Rounds = defaultProjectRounds
 	}
-	var roundIds []uint
+	var rounds []model.Round
 	for _, val := range req.Rounds {
 		var round = model.Round{
 			ContestID: contest.ID,
@@ -70,9 +70,9 @@ func (c *Client) addContest(req AddContestRequest) error {
 		}
 		round.SetUpsets(val.Upsets)
 		c.db.Create(&round)
-		roundIds = append(roundIds, round.ID)
+		rounds = append(rounds, round)
 	}
-	contest.SetRoundIds(roundIds)
+	contest.SetRoundIds(rounds)
 	err := c.db.Save(&contest).Error
 	return err
 }
@@ -97,20 +97,13 @@ func (c *Client) removeContest(contestId uint) error {
 }
 
 // getContest 获取比赛信息
-func (c *Client) getContest(contestId uint) (contest model.Contest, rounds []model.Round, err error) {
+func (c *Client) getContest(contestId uint) (contest model.Contest, err error) {
 	if err = c.db.First(&contest, "id = ?", contestId).Error; err != nil {
 		return
 	}
 
-	if err = c.db.Find(&rounds, "contest_id = ?", contestId).Error; err != nil {
+	if err = c.db.Find(&contest.Rounds, "id in ?", contest.GetRoundIds()).Error; err != nil {
 		return
-	}
-
-	for i := 0; i < len(rounds); i++ {
-		rounds[i].GetUpsets()
-		if !rounds[i].IsStart {
-			rounds[i].UpsetsVal = []string{}
-		}
 	}
 	return
 }
@@ -140,6 +133,10 @@ func (c *Client) getContests(page, size int, typ string) (int64, []model.Contest
 	}
 	if err != nil {
 		return 0, nil, err
+	}
+
+	for i := 0; i < len(contests); i++ {
+		c.db.Where("id in ?", contests[i].GetRoundIds()).Find(&contests[i].Rounds)
 	}
 
 	return count, contests, nil

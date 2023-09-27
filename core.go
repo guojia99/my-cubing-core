@@ -56,14 +56,14 @@ type PlayerCore interface {
 }
 
 type ContestCore interface {
-	AddContest(AddContestRequest) error                                                 // 添加比赛
-	RemoveContest(contestId uint) error                                                 // 删除比赛
-	GetContest(contestId uint) (contest model.Contest, rounds []model.Round, err error) // 获取信息
-	GetContests(page, size int, typ string) (int64, []model.Contest, error)             // 获取比赛列表 （分页）
-	GetContestSor(contestID uint) (single, avg map[model.SorStatisticsKey][]SorScore)   // 获取比赛sor排名
-	GetContestScore(contestID uint) map[model.Project][]RoutesScores                    // 获取比赛成绩列表
-	GetContestPodiums(contestID uint) []Podiums                                         // 获取比赛领奖台
-	GetContestRecord(contestID uint) []RecordMessage                                    // 获取比赛记录列表
+	AddContest(AddContestRequest) error                                               // 添加比赛
+	RemoveContest(contestId uint) error                                               // 删除比赛
+	GetContest(contestId uint) (contest model.Contest, err error)                     // 获取信息
+	GetContests(page, size int, typ string) (int64, []model.Contest, error)           // 获取比赛列表 （分页）
+	GetContestSor(contestID uint) (single, avg map[model.SorStatisticsKey][]SorScore) // 获取比赛sor排名
+	GetContestScore(contestID uint) map[model.Project][]RoutesScores                  // 获取比赛成绩列表
+	GetContestPodiums(contestID uint) []Podiums                                       // 获取比赛领奖台
+	GetContestRecord(contestID uint) []RecordMessage                                  // 获取比赛记录列表
 }
 
 type StatisticalCore interface {
