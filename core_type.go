@@ -3,7 +3,7 @@ package core
 import (
 	"sort"
 
-	"github.com/guojia99/mycubing_core/model"
+	"github.com/guojia99/my-cubing-core/model"
 )
 
 type (

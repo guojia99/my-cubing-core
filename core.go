@@ -12,7 +12,7 @@ import (
 	"github.com/patrickmn/go-cache"
 	"gorm.io/gorm"
 
-	"github.com/guojia99/mycubing_core/model"
+	"github.com/guojia99/my-cubing-core/model"
 )
 
 func NewCore(db *gorm.DB, debug bool, cacheTime time.Duration) *Client {

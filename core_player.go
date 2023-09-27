@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"sort"
 
-	"github.com/guojia99/mycubing_core/model"
+	"github.com/guojia99/my-cubing-core/model"
 )
 
 func checkName(name string) bool {

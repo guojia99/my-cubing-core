@@ -6,7 +6,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/guojia99/mycubing_core/model"
+	"github.com/guojia99/my-cubing-core/model"
 )
 
 var defaultProjectRounds = func() []CreateContestRequestRound {

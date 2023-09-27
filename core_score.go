@@ -8,7 +8,7 @@ import (
 
 	jsoniter "github.com/json-iterator/go"
 
-	"github.com/guojia99/mycubing_core/model"
+	"github.com/guojia99/my-cubing-core/model"
 )
 
 // addScore 添加一条成绩

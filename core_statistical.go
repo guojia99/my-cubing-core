@@ -1,6 +1,6 @@
 package core
 
-import "github.com/guojia99/mycubing_core/model"
+import "github.com/guojia99/my-cubing-core/model"
 
 func (c *Client) getRecords(page, size int) (int64, []model.Record, error) {
 	if size == 0 || size > 100 {

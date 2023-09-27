@@ -1,4 +1,4 @@
-module github.com/guojia99/mycubing_core
+module github.com/guojia99/my-cubing-core
 
 go 1.18
 
