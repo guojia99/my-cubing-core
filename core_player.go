@@ -9,17 +9,12 @@ import (
 )
 
 func checkName(name string) bool {
-	pattern := regexp.MustCompile(`^[\p{Han}a-zA-Z0-9_]{2,15}$`)
+	pattern := regexp.MustCompile(`^[\p{Han}a-zA-Z0-9_]{1,15}$`)
 	return pattern.MatchString(name)
 }
 
 // 添加玩家
 func (c *Client) addPlayer(player model.Player) error {
-	var p model.Player
-	if err := c.db.Where("name =  ?", player.Name).First(&p).Error; err != nil {
-		return err
-	}
-
 	if !checkName(player.Name) {
 		return errors.New("invalid name")
 	}
@@ -33,7 +28,7 @@ func (c *Client) addPlayer(player model.Player) error {
 // 更新玩家信息
 func (c *Client) updatePlayer(playerId uint, player model.Player) error {
 	var p model.Player
-	if err := c.db.Where("id = ?", playerId).First(&player).Error; err != nil {
+	if err := c.db.Where("id = ?", playerId).First(&p).Error; err != nil {
 		return err
 	}
 
