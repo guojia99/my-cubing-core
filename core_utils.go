@@ -44,7 +44,6 @@ func (c *Client) parserRelativeSor(players []model.Player, bestSingle, bestAvg m
 				if _, ok := bestSingle1[pj]; !ok {
 					continue
 				}
-
 				// 1, 计时项目:
 				// 项目分: ((gr最佳 + 1 / 个人最佳 + 1)  + (gr平均 + 1  / 个人平均最佳 + 1)) * 10
 				// 没有玩的项目直接给1分
@@ -52,7 +51,7 @@ func (c *Client) parserRelativeSor(players []model.Player, bestSingle, bestAvg m
 				// 项目分:  (个人最佳分 + 1 / gr分 + 1 )  * gr个数
 
 				// 2. 如果选手无最佳代表 平均都没有
-				if _, ok := singlePlayerDict[pj][player.ID]; !ok {
+				if _, ok := singlePlayerDict[pj][player.ID]; !ok || singlePlayerDict[pj][player.ID].Best <= model.DNF {
 					switch pj.RouteType() {
 					case model.RouteTypeRepeatedly:
 						playerCache[player.ID].Sor += (1.0 / bestSingle1[pj].Best) * bestSingle1[pj].Result1
@@ -82,12 +81,12 @@ func (c *Client) parserRelativeSor(players []model.Player, bestSingle, bestAvg m
 				}
 
 				// 5. 如果选手有最佳但无平均
-				if _, ok := avgPlayerDict[pj][player.ID]; !ok {
+				if _, ok := avgPlayerDict[pj][player.ID]; !ok || avgPlayerDict[pj][player.ID].Avg <= model.DNF {
 					playerCache[player.ID].Sor += 1
 					continue
 				}
 
-				playerCache[player.ID].Sor += ((bestSingle1[pj].Avg + 1) / (singlePlayerDict[pj][player.ID].Avg + 1)) * 10
+				playerCache[player.ID].Sor += ((bestAvg1[pj].Avg + 1) / (singlePlayerDict[pj][player.ID].Avg + 1)) * 10
 			}
 		}
 
@@ -98,7 +97,7 @@ func (c *Client) parserRelativeSor(players []model.Player, bestSingle, bestAvg m
 				Sor:    val.Sor,
 			})
 		}
-		sort.Slice(data, func(i, j int) bool { return data[i].Sor < data[j].Sor })
+		sort.Slice(data, func(i, j int) bool { return data[i].Sor >= data[j].Sor })
 		allPlayerSor[sorKey] = data
 	}
 	return
