@@ -6,15 +6,10 @@ import (
 	"github.com/guojia99/my-cubing-core/model"
 )
 
-// parserSorSort 解析sor
-func parserSorSort(players []model.Player, bestSingle, bestAvg map[model.Project][]model.Score) (single, avg map[model.SorStatisticsKey][]SorScore) {
-	single, avg = make(map[model.SorStatisticsKey][]SorScore, len(model.SorKeyMap())), make(map[model.SorStatisticsKey][]SorScore, len(model.SorKeyMap()))
+func playerByProjectMap(bestSingle, bestAvg map[model.Project][]model.Score) (singlePlayerDict, avgPlayerDict map[model.Project]map[uint]model.Score) {
+	singlePlayerDict = make(map[model.Project]map[uint]model.Score)
+	avgPlayerDict = make(map[model.Project]map[uint]model.Score)
 
-	// todo 抽出来
-	var singlePlayerDict = make(map[model.Project]map[uint]model.Score)
-	var avgPlayerDict = make(map[model.Project]map[uint]model.Score)
-
-	// 1. 做map缓存
 	for _, pj := range model.AllProjectRoute() {
 		singlePlayerDict[pj] = make(map[uint]model.Score)
 		avgPlayerDict[pj] = make(map[uint]model.Score)
@@ -30,8 +25,92 @@ func parserSorSort(players []model.Player, bestSingle, bestAvg map[model.Project
 			}
 		}
 	}
+	return
+}
 
-	// 2. 全项目排序
+// todo 考虑多线程
+func (c *Client) parserRelativeSor(players []model.Player, bestSingle, bestAvg map[model.Project][]model.Score) (allPlayerSor map[model.SorStatisticsKey][]RelativeSor) {
+	allPlayerSor = make(map[model.SorStatisticsKey][]RelativeSor)
+
+	bestSingle1, bestAvg1 := c.getAllProjectBestScores()                       // 全场最佳的成绩
+	singlePlayerDict, avgPlayerDict := playerByProjectMap(bestSingle, bestAvg) // 个人成绩缓存 map[model.Project]map[uint]model.Score
+	for sorKey, projects := range model.SorKeyMap() {
+		var playerCache = make(map[uint]*RelativeSor)
+
+		for _, player := range players {
+			playerCache[player.ID] = &RelativeSor{Player: player}
+			for _, pj := range projects {
+				// 1. 如果该项目无最佳,则代表没人玩
+				if _, ok := bestSingle1[pj]; !ok {
+					continue
+				}
+
+				// 1, 计时项目:
+				// 项目分: ((gr最佳 + 1 / 个人最佳 + 1)  + (gr平均 + 1  / 个人平均最佳 + 1)) * 10
+				// 没有玩的项目直接给1分
+				//2. 多盲项目:
+				// 项目分:  (个人最佳分 + 1 / gr分 + 1 )  * gr个数
+
+				// 2. 如果选手无最佳代表 平均都没有
+				if _, ok := singlePlayerDict[pj][player.ID]; !ok {
+					switch pj.RouteType() {
+					case model.RouteTypeRepeatedly:
+						playerCache[player.ID].Sor += (1.0 / bestSingle1[pj].Best) * bestSingle1[pj].Result1
+					case model.RouteType1rounds:
+						playerCache[player.ID].Sor += 1
+					default:
+						playerCache[player.ID].Sor += 2
+					}
+					continue
+				}
+
+				// 3. 添加单次成绩
+				switch pj.RouteType() {
+				case model.RouteTypeRepeatedly:
+					playerCache[player.ID].Sor += (singlePlayerDict[pj][player.ID].Best / bestSingle1[pj].Best) * bestSingle1[pj].Result1
+					continue
+				case model.RouteType1rounds:
+					playerCache[player.ID].Sor += ((bestSingle1[pj].Best + 1) / (singlePlayerDict[pj][player.ID].Best + 1)) * 10
+					continue
+				default:
+					playerCache[player.ID].Sor += ((bestSingle1[pj].Best + 1) / (singlePlayerDict[pj][player.ID].Best + 1)) * 10
+				}
+
+				// 4, 如果该项目无最佳平均或该项目无平均
+				if _, ok := bestAvg1[pj]; !ok {
+					continue
+				}
+
+				// 5. 如果选手有最佳但无平均
+				if _, ok := avgPlayerDict[pj][player.ID]; !ok {
+					playerCache[player.ID].Sor += 1
+					continue
+				}
+
+				playerCache[player.ID].Sor += ((bestSingle1[pj].Avg + 1) / (singlePlayerDict[pj][player.ID].Avg + 1)) * 10
+			}
+		}
+
+		var data []RelativeSor
+		for _, val := range playerCache {
+			data = append(data, RelativeSor{
+				Player: val.Player,
+				Sor:    val.Sor,
+			})
+		}
+		sort.Slice(data, func(i, j int) bool { return data[i].Sor < data[j].Sor })
+		allPlayerSor[sorKey] = data
+	}
+	return
+}
+
+// todo 考虑多线程
+// parserSorSort 解析sor
+func parserSorSort(players []model.Player, bestSingle, bestAvg map[model.Project][]model.Score) (single, avg map[model.SorStatisticsKey][]SorScore) {
+	single, avg = make(map[model.SorStatisticsKey][]SorScore, len(model.SorKeyMap())), make(map[model.SorStatisticsKey][]SorScore, len(model.SorKeyMap()))
+
+	singlePlayerDict, avgPlayerDict := playerByProjectMap(bestSingle, bestAvg)
+
 	for sorKey, projects := range model.SorKeyMap() {
 		var s = make([]SorScore, 0)
 		var a = make([]SorScore, 0)

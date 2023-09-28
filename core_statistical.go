@@ -1,6 +1,8 @@
 package core
 
-import "github.com/guojia99/my-cubing-core/model"
+import (
+	"github.com/guojia99/my-cubing-core/model"
+)
 
 func (c *Client) getRecords(page, size int) (int64, []model.Record, error) {
 	if size == 0 || size > 100 {
@@ -164,4 +166,14 @@ func (c *Client) getPodiums() []Podiums {
 	}
 	SortPodiums(out)
 	return out
+}
+
+func (c *Client) getRelativeSor() (allPlayerSor map[model.SorStatisticsKey][]RelativeSor) {
+	allPlayerSor = make(map[model.SorStatisticsKey][]RelativeSor)
+	var players []model.Player
+	if err := c.db.Find(&players).Error; err != nil {
+		return
+	}
+	allBest, allAvg := c.getBestScore()
+	return c.parserRelativeSor(players, allBest, allAvg)
 }

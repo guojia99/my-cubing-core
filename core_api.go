@@ -357,3 +357,13 @@ func (c *Client) GetPodiums() []Podiums {
 	_ = c.cache.Add(key, out, c.cacheTime)
 	return out
 }
+
+func (c *Client) GetRelativeSor() (allPlayerSor map[model.SorStatisticsKey][]RelativeSor) {
+	key := fmt.Sprintf("GetRelativeSor")
+	if val, ok := c.cache.Get(key); ok && !c.debug {
+		return val.(map[model.SorStatisticsKey][]RelativeSor)
+	}
+	allPlayerSor = c.getRelativeSor()
+	_ = c.cache.Add(key, allPlayerSor, c.cacheTime)
+	return
+}

@@ -15,7 +15,7 @@ import (
 	"github.com/guojia99/my-cubing-core/model"
 )
 
-func NewCore(db *gorm.DB, debug bool, cacheTime time.Duration) *Client {
+func NewCore(db *gorm.DB, debug bool, cacheTime time.Duration) Core {
 	if cacheTime == 0 {
 		cacheTime = time.Minute * 15
 	}
@@ -71,6 +71,7 @@ type StatisticalCore interface {
 	GetBestScore() (bestSingle, bestAvg map[model.Project][]model.Score)             // 获取所有项目每个人的最佳成绩汇总
 	GetBestScoreByProject(project model.Project) (bestSingle, bestAvg []model.Score) // 获取单项目每个人最佳成绩汇总成绩
 	GetAllProjectBestScores() (bestSingle, bestAvg map[model.Project]model.Score)    // 获取所有项目最佳成绩
-	GetSor() (single, avg map[model.SorStatisticsKey][]SorScore)                     // 获取sor排名汇总
 	GetPodiums() []Podiums                                                           // 获取领奖台汇总
+	GetSor() (single, avg map[model.SorStatisticsKey][]SorScore)                     // 获取sor排名汇总
+	GetRelativeSor() (allPlayerSor map[model.SorStatisticsKey][]RelativeSor)         // 相对排位分, 返回所有人的平均排位分,计算方式是用当前最佳成绩为标准, 计算与其差距
 }

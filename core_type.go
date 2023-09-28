@@ -110,3 +110,8 @@ type OldEnemyDetail struct {
 }
 
 type OldEnemyDetails []OldEnemyDetail
+
+type RelativeSor struct {
+	Player model.Player `json:"Player,omitempty"`
+	Sor    float64      `json:"Sor,omitempty"`
+}
