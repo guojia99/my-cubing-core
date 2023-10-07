@@ -185,12 +185,12 @@ func (c *Client) getContestTop(contestID uint, n int) map[model.Project][]model.
 		lastScores := scores[0]
 
 		var s []model.Score
-		for i := 0; i < len(lastScores.Scores); i++ {
+		for i := 0; i < len(lastScores.Scores) && i <= n; i++ {
 			if i < n {
 				s = append(s, lastScores.Scores[i])
 			}
-			if i > n {
-				break
+			if lastScores.Scores[i].DBest() {
+				continue
 			}
 		}
 		out[project] = s

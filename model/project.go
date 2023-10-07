@@ -20,6 +20,26 @@ const (
 	RouteTypeRepeatedly   RouteType = "ry"       // 单轮多次还原项目, 成绩1:还原数; 成绩2:尝试数; 成绩3:时间;
 )
 
+func (r RouteType) String() string {
+	switch r {
+	case RouteType1rounds:
+		return "单轮项目"
+	case RouteType3roundsBest:
+		return "三轮取最佳"
+	case RouteType3roundsAvg:
+		return "三轮取平均"
+	case RouteType5roundsBest:
+		return "五轮取最佳"
+	case RouteType5roundsAvg:
+		return "五轮取平均"
+	case RouteType5RoundsAvgHT:
+		return "五轮去头尾取平均"
+	case RouteTypeRepeatedly:
+		return "单轮多次还原项目"
+	}
+	return string(r)
+}
+
 func AllProjectRoute() []Project       { return allProjectRoute }
 func WCAProjectRoute() []Project       { return wcaProjectRoute }
 func XCubeProjectRoute() []Project     { return xCubeProjectRoute }

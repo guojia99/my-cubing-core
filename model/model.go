@@ -21,4 +21,5 @@ var Models = []interface{}{
 	&Player{},
 	&Score{},
 	&Record{},
+	&PlayerUser{},
 }

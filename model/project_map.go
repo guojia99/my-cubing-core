@@ -61,6 +61,25 @@ const (
 	XCube333Ghost        Project = "333ghost"
 	XCube333ZongZi       Project = "333Zongzi"
 	Xcube333Clone        Project = "333clone"
+	XCubeMapleLeaf       Project = "maple_leaf"
+	XCube222Minx         Project = "222minx"
+
+	// 数独系列
+	XCubeSuDuKuVeryEasy Project = "suduku_very_easy"
+	XCubeSuDuKuEasy     Project = "suduku_easy"
+	XCubeSuDuKuModerate Project = "suduku_moderate"
+	XCubeSuDuKuAdvanced Project = "suduku_advanced"
+	XCubeSuDuKuHard     Project = "suduku_hard"
+	XCubeSuDuKuMaster   Project = "suduku_master"
+
+	// 数字华容道系列
+	XCube8Puzzle  Project = "8puzzle"
+	XCube15Puzzle Project = "15puzzle"
+	XCube24Puzzle Project = "24puzzle"
+	XCube35Puzzle Project = "35puzzle"
+	XCube48Puzzle Project = "48puzzle"
+	XCube63Puzzle Project = "63puzzle"
+	XCube80Puzzle Project = "80puzzle"
 )
 
 var projectsItems = []projectItem{
@@ -117,6 +136,23 @@ var projectsItems = []projectItem{
 	{Project: XCube333Ghost, Cn: "鬼魔", RouteType: RouteType5RoundsAvgHT, IsWca: false},
 	{Project: XCube333ZongZi, Cn: "粽子魔方", RouteType: RouteType5RoundsAvgHT, IsWca: false},
 	{Project: Xcube333Clone, Cn: "三阶克隆", RouteType: RouteType5RoundsAvgHT, IsWca: false},
+	{Project: XCubeMapleLeaf, Cn: "枫叶魔方", RouteType: RouteType5RoundsAvgHT, IsWca: false},
+	{Project: XCube222Minx, Cn: "二阶五魔", RouteType: RouteType5RoundsAvgHT, IsWca: false},
+
+	{Project: XCubeSuDuKuVeryEasy, Cn: "数独入门", RouteType: RouteType5RoundsAvgHT, IsWca: false},
+	{Project: XCubeSuDuKuEasy, Cn: "数独初级", RouteType: RouteType5RoundsAvgHT, IsWca: false},
+	{Project: XCubeSuDuKuModerate, Cn: "数独中级", RouteType: RouteType5RoundsAvgHT, IsWca: false},
+	{Project: XCubeSuDuKuAdvanced, Cn: "数独高级", RouteType: RouteType3roundsBest, IsWca: false},
+	{Project: XCubeSuDuKuHard, Cn: "数独困难", RouteType: RouteType3roundsBest, IsWca: false},
+	{Project: XCubeSuDuKuMaster, Cn: "数独大师", RouteType: RouteType3roundsBest, IsWca: false},
+
+	{Project: XCube8Puzzle, Cn: "3阶数字华容道", RouteType: RouteType5RoundsAvgHT, IsWca: false},
+	{Project: XCube15Puzzle, Cn: "4阶数字华容道", RouteType: RouteType5RoundsAvgHT, IsWca: false},
+	{Project: XCube24Puzzle, Cn: "5阶数字华容道", RouteType: RouteType5RoundsAvgHT, IsWca: false},
+	{Project: XCube35Puzzle, Cn: "6阶数字华容道", RouteType: RouteType3roundsBest, IsWca: false},
+	{Project: XCube48Puzzle, Cn: "7阶数字华容道", RouteType: RouteType3roundsBest, IsWca: false},
+	{Project: XCube63Puzzle, Cn: "8阶数字华容道", RouteType: RouteType3roundsBest, IsWca: false},
+	{Project: XCube80Puzzle, Cn: "9阶数字华容道", RouteType: RouteType3roundsBest, IsWca: false},
 }
 
 var projectItemsMap = make(map[Project]projectItem, len(projectsItems))
