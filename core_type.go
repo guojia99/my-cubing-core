@@ -34,6 +34,18 @@ type (
 		StartTime   int64                       `json:"StartTime"`
 		EndTime     int64                       `json:"EndTime"`
 	}
+
+	AddPreScoreRequest struct {
+		AddScoreRequest
+		Source   string
+		Recorder string
+	}
+
+	ProcessPreScoreRequest struct {
+		Id           uint
+		Processor    string
+		FinishDetail string
+	}
 )
 
 type RankScore struct {

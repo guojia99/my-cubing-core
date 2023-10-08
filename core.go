@@ -39,6 +39,11 @@ type ScoreCore interface {
 	RemoveScore(scoreID uint) error                                               // 移除一条成绩
 	EndContestScore(contestId uint) error                                         // 结束比赛并统计比赛结果
 	GetScoreByPlayerContest(playerId uint, contestId uint) ([]model.Score, error) // 获取玩家在某场比赛的成绩
+
+	AddPreScore(AddPreScoreRequest) error                                               // 添加一个预录入的成绩
+	ProcessPreScore(ProcessPreScoreRequest) error                                       // 处理一个预录入的成绩
+	GetPreScores(page, size int, useFinal, final bool) (int64, []model.PreScore, error) // 获取预录入的成绩列表(分页), useFinal表示是否使用final筛选字段
+	GetPreScoresByContest(contestID uint) ([]model.PreScore, error)                     // 按比赛获取
 }
 
 type PlayerCore interface {

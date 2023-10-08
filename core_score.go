@@ -25,7 +25,7 @@ func (c *Client) addScore(playerID uint, contestID uint, project model.Project, 
 		return err
 	}
 	if !round.IsStart {
-		return fmt.Errorf("this round not start")
+		return errors.New("该轮次未开始")
 	}
 
 	// 3. 玩家信息

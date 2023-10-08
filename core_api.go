@@ -71,6 +71,26 @@ func (c *Client) GetScoreByPlayerContest(playerId uint, contestId uint) ([]model
 	return out, nil
 }
 
+func (c *Client) AddPreScore(request AddPreScoreRequest) error {
+	return c.addPreScore(request)
+}
+
+func (c *Client) ProcessPreScore(request ProcessPreScoreRequest) error {
+	if err := c.processPreScore(request); err != nil {
+		return err
+	}
+	c.reloadCache()
+	return nil
+}
+
+func (c *Client) GetPreScores(page, size int, useFinal, final bool) (int64, []model.PreScore, error) {
+	return c.getPreScores(page, size, useFinal, final)
+}
+
+func (c *Client) GetPreScoresByContest(contestID uint) ([]model.PreScore, error) {
+	return c.getPreScoresByContest(contestID)
+}
+
 // player core
 
 func (c *Client) AddPlayer(player model.Player) error {

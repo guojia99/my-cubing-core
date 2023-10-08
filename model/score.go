@@ -34,10 +34,9 @@ type Score struct {
 	Avg          float64 `json:"Avg,omitempty" gorm:"column:avg;NULL"`                        // 五把平均成绩
 	IsBestSingle bool    `json:"IsBestSingle,omitempty" gorm:"column:is_best_single"`         // 这是玩家比往期最佳的还好的成绩
 	IsBestAvg    bool    `json:"IsBestAvg,omitempty" gorm:"column:is_best_avg"`               // 这是这个玩家比往期最佳的成绩还好的平均成绩
-	Penalty      string  `json:"Penalty,omitempty" grom:"column:penalty"`                     // 判罚 ScorePenalty
+	Penalty      string  `json:"Penalty,omitempty" gorm:"column:penalty"`                     // 判罚 ScorePenalty
 	Rank         int     `json:"Rank,omitempty" gorm:"column:rank"`                           // 排名
-
-	RouteValue Round `json:"RouteValue,omitempty" gorm:"-"` // 轮次实际内容
+	RouteValue   Round   `json:"RouteValue,omitempty" gorm:"-"`                               // 轮次实际内容
 }
 
 type ScorePenalty struct {
