@@ -171,10 +171,14 @@ func (s *Score) IsBestScore(other Score) bool {
 		// - the result3 is use times, (max back row).
 		// - sort priority： r1 > r2 > r3
 		// - like: if r1 and r2 equal, the best r3 is rank the top.
-		if s.Result1 == other.Result1 {
-			return s.Result2 < other.Result2 || s.Result3 < other.Result3
+
+		if s.DBest() || other.DBest() {
+			return !s.DBest()
 		}
-		return s.Result1 > other.Result1
+		if s.Best == other.Best {
+			return s.Result3 < other.Result3
+		}
+		return s.Best > other.Best
 	default:
 		if s.DBest() || other.DBest() {
 			return !s.DBest()
