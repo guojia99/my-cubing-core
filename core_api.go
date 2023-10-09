@@ -83,16 +83,16 @@ func (c *Client) ProcessPreScore(request ProcessPreScoreRequest) error {
 	return nil
 }
 
-func (c *Client) GetPreScores(page, size int, useFinal, final bool) (int64, []model.PreScore, error) {
-	return c.getPreScores(page, size, useFinal, final)
+func (c *Client) GetPreScores(page, size int, final Bool) (int64, []model.PreScore, error) {
+	return c.getPreScores(page, size, final)
 }
 
-func (c *Client) GetPreScoresByPlayer(playerID uint) ([]model.PreScore, error) {
-	return c.getPreScoresByPlayer(playerID)
+func (c *Client) GetPreScoresByPlayer(playerID uint, page, size int, final Bool) (int64, []model.PreScore, error) {
+	return c.getPreScoresByPlayer(playerID, page, size, final)
 }
 
-func (c *Client) GetPreScoresByContest(contestID uint) ([]model.PreScore, error) {
-	return c.getPreScoresByContest(contestID)
+func (c *Client) GetPreScoresByContest(contestID uint, page, size int, final Bool) (int64, []model.PreScore, error) {
+	return c.getPreScoresByContest(contestID, page, size, final)
 }
 
 // player core
@@ -215,6 +215,17 @@ func (c *Client) GetPlayerOldEnemy(playerId uint) OldEnemyDetails {
 	}
 
 	out := c.getPlayerOldEnemy(playerId)
+	_ = c.cache.Add(key, out, c.cacheTime)
+	return out
+}
+
+func (c *Client) GetPlayerRelativeSor(playerID uint) map[model.SorStatisticsKey]RelativeSor {
+	key := fmt.Sprintf("GetPlayerRelativeSor_%v", playerID)
+	if val, ok := c.cache.Get(key); ok && !c.debug {
+		return val.(map[model.SorStatisticsKey]RelativeSor)
+	}
+
+	out := c.getPlayerRelativeSor(playerID)
 	_ = c.cache.Add(key, out, c.cacheTime)
 	return out
 }
@@ -390,4 +401,16 @@ func (c *Client) GetRelativeSor() (allPlayerSor map[model.SorStatisticsKey][]Rel
 	allPlayerSor = c.getRelativeSor()
 	_ = c.cache.Add(key, allPlayerSor, c.cacheTime)
 	return
+}
+
+func (c *Client) GetAvgRelativeSor() map[model.SorStatisticsKey]RelativeSor {
+	key := fmt.Sprintf("GetRelativeSor")
+	if val, ok := c.cache.Get(key); ok && !c.debug {
+		return val.(map[model.SorStatisticsKey]RelativeSor)
+	}
+
+	out := c.getAvgRelativeSor()
+	_ = c.cache.Add(key, out, c.cacheTime)
+	return out
+
 }

@@ -6,6 +6,14 @@ import (
 	"github.com/guojia99/my-cubing-core/model"
 )
 
+type Bool uint
+
+const (
+	NotBool   Bool = 0
+	FalseBool Bool = 1
+	TrueBool  Bool = 2
+)
+
 type (
 	AddScoreRequest struct {
 		PlayerID  uint

@@ -433,3 +433,33 @@ loop:
 	}
 	return out
 }
+
+func (c *Client) getPlayerRelativeSor(playerID uint) map[model.SorStatisticsKey]RelativeSor {
+	var out = make(map[model.SorStatisticsKey]RelativeSor)
+	var player model.Player
+	if err := c.db.Where("id = ?", playerID).First(&player).Error; err != nil {
+		return out
+	}
+	bestSingle, bestAvg := c.getPlayerBestScore(playerID)
+
+	var bs = make(map[model.Project][]model.Score)
+	var ba = make(map[model.Project][]model.Score)
+	for _, pj := range model.AllProjectRoute() {
+		if s, ok := bestSingle[pj]; ok {
+			bs[pj] = []model.Score{s.Score}
+		}
+		if a, ok := bestAvg[pj]; ok {
+			ba[pj] = []model.Score{a.Score}
+		}
+	}
+
+	sor := c.parserRelativeSor([]model.Player{player}, bs, ba)
+
+	for k, _ := range model.SorKeyMap() {
+		if _, ok := sor[k]; !ok || len(sor[k]) == 0 {
+			continue
+		}
+		out[k] = sor[k][0]
+	}
+	return out
+}

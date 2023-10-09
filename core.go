@@ -40,11 +40,11 @@ type ScoreCore interface {
 	EndContestScore(contestId uint) error                                         // 结束比赛并统计比赛结果
 	GetScoreByPlayerContest(playerId uint, contestId uint) ([]model.Score, error) // 获取玩家在某场比赛的成绩
 
-	AddPreScore(AddPreScoreRequest) error                                               // 添加一个预录入的成绩
-	ProcessPreScore(ProcessPreScoreRequest) error                                       // 处理一个预录入的成绩
-	GetPreScores(page, size int, useFinal, final bool) (int64, []model.PreScore, error) // 获取预录入的成绩列表(分页), useFinal表示是否使用final筛选字段
-	GetPreScoresByPlayer(playerID uint) ([]model.PreScore, error)                       // 按玩家获取
-	GetPreScoresByContest(contestID uint) ([]model.PreScore, error)                     // 按比赛获取
+	AddPreScore(AddPreScoreRequest) error                                                              // 添加一个预录入的成绩
+	ProcessPreScore(ProcessPreScoreRequest) error                                                      // 处理一个预录入的成绩
+	GetPreScores(page, size int, final Bool) (int64, []model.PreScore, error)                          // 获取预录入的成绩列表(分页), useFinal表示是否使用final筛选字段
+	GetPreScoresByPlayer(playerID uint, page, size int, final Bool) (int64, []model.PreScore, error)   // 按玩家获取(分页)
+	GetPreScoresByContest(contestID uint, page, size int, final Bool) (int64, []model.PreScore, error) // 按比赛获取(分页)
 }
 
 type PlayerCore interface {
@@ -59,6 +59,7 @@ type PlayerCore interface {
 	GetPlayerScore(playerID uint) (bestSingle, bestAvg []model.Score, scores []ScoresByContest) // 获取玩家所有成绩
 	GetPlayerSor(playerID uint) (single, avg map[model.SorStatisticsKey]SorScore)               // 获取玩家sor信息
 	GetPlayerOldEnemy(playerID uint) OldEnemyDetails                                            // 获取玩家宿敌信息
+	GetPlayerRelativeSor(playerID uint) map[model.SorStatisticsKey]RelativeSor                  // 获取单个玩家的相对排位分
 }
 
 type ContestCore interface {
@@ -79,5 +80,6 @@ type StatisticalCore interface {
 	GetAllProjectBestScores() (bestSingle, bestAvg map[model.Project]model.Score)    // 获取所有项目最佳成绩
 	GetPodiums() []Podiums                                                           // 获取领奖台汇总
 	GetSor() (single, avg map[model.SorStatisticsKey][]SorScore)                     // 获取sor排名汇总
+	GetAvgRelativeSor() map[model.SorStatisticsKey]RelativeSor                       // 平均相对排位分
 	GetRelativeSor() (allPlayerSor map[model.SorStatisticsKey][]RelativeSor)         // 相对排位分, 返回所有人的平均排位分,计算方式是用当前最佳成绩为标准, 计算与其差距
 }

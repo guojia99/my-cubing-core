@@ -177,3 +177,24 @@ func (c *Client) getRelativeSor() (allPlayerSor map[model.SorStatisticsKey][]Rel
 	allBest, allAvg := c.getBestScore()
 	return c.parserRelativeSor(players, allBest, allAvg)
 }
+
+func (c *Client) getAvgRelativeSor() map[model.SorStatisticsKey]RelativeSor {
+	all := c.getRelativeSor()
+
+	var out = make(map[model.SorStatisticsKey]RelativeSor)
+	for k, _ := range model.SorKeyMap() {
+		if _, ok := all[k]; !ok {
+			continue
+		}
+		n := float64(len(all[k]))
+		if n == 0 {
+			continue
+		}
+		data := RelativeSor{}
+		for _, val := range all[k] {
+			data.Sor += val.Sor / n
+		}
+		out[k] = data
+	}
+	return out
+}

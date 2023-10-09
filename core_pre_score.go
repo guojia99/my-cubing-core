@@ -61,7 +61,7 @@ func (c *Client) processPreScore(request ProcessPreScoreRequest) error {
 	return c.db.Save(&preScore).Error
 }
 
-func (c *Client) getPreScores(page, size int, useFinal, final bool) (int64, []model.PreScore, error) {
+func (c *Client) getPreScores(page, size int, final Bool) (int64, []model.PreScore, error) {
 	var (
 		count int64
 		err   error
@@ -78,8 +78,8 @@ func (c *Client) getPreScores(page, size int, useFinal, final bool) (int64, []mo
 	offset := (page - 1) * size
 	limit := size
 
-	if useFinal {
-		err = c.db.Where("finish = ?", final).Offset(offset).Limit(limit).Find(&out).Error
+	if final > NotBool {
+		err = c.db.Where("finish = ?", final == TrueBool).Offset(offset).Limit(limit).Find(&out).Error
 		c.db.Where("finish = ?", final).Count(&count)
 		return count, out, err
 	}
@@ -88,22 +88,56 @@ func (c *Client) getPreScores(page, size int, useFinal, final bool) (int64, []mo
 	return count, out, err
 }
 
-func (c *Client) getPreScoresByContest(contestID uint) ([]model.PreScore, error) {
+func (c *Client) getPreScoresByContest(contestID uint, page, size int, final Bool) (int64, []model.PreScore, error) {
 	var (
-		err error
-		out []model.PreScore
+		count int64
+		err   error
+		out   []model.PreScore
 	)
 
-	err = c.db.Where("contest_id = ?", contestID).Find(&out).Error
-	return out, err
+	if page == 0 {
+		page = 1
+	}
+	if size == 0 || size > 100 {
+		size = 100
+	}
+
+	offset := (page - 1) * size
+	limit := size
+
+	if final > NotBool {
+		err = c.db.Where("contest_id = ?", contestID).Where("finish = ?", final == TrueBool).Offset(offset).Limit(limit).Find(&out).Error
+		c.db.Where("contest_id = ?", contestID).Where("finish = ?", final == TrueBool).Count(&count)
+		return count, out, err
+	}
+	err = c.db.Offset(offset).Limit(limit).Find(&out).Error
+	c.db.Count(&count)
+	return count, out, err
 }
 
-func (c *Client) getPreScoresByPlayer(playerID uint) ([]model.PreScore, error) {
+func (c *Client) getPreScoresByPlayer(playerID uint, page, size int, final Bool) (int64, []model.PreScore, error) {
 	var (
-		err error
-		out []model.PreScore
+		count int64
+		err   error
+		out   []model.PreScore
 	)
 
-	err = c.db.Where("player_id = ?", playerID).Find(&out).Error
-	return out, err
+	if page == 0 {
+		page = 1
+	}
+	if size == 0 || size > 100 {
+		size = 100
+	}
+
+	offset := (page - 1) * size
+	limit := size
+
+	if final > NotBool {
+		err = c.db.Where("player_id = ?", playerID).Where("finish = ?", final == TrueBool).Offset(offset).Limit(limit).Find(&out).Error
+		c.db.Where("player_id = ?", playerID).Where("finish = ?", final == TrueBool).Count(&count)
+		return count, out, err
+	}
+	err = c.db.Offset(offset).Limit(limit).Find(&out).Error
+	c.db.Count(&count)
+	return count, out, err
 }
