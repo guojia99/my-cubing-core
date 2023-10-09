@@ -191,11 +191,23 @@ func (c *Client) getAvgRelativeSor() map[model.SorStatisticsKey]RelativeSor {
 			continue
 		}
 		data := RelativeSor{}
+
+		top5 := 5
+		if len(all[k]) > 100 {
+			top5 = int(float64(len(all[k])) * 0.05)
+		}
+		if len(all[k]) <= 5 {
+			top5 = len(all[k])
+		}
+
 		for idx, val := range all[k] {
 			if idx == 0 {
 				data.Max = val.Sor
 			}
-			data.Sor += val.Sor / n
+			if idx < top5 {
+				data.Top5 += val.Sor / float64(top5)
+			}
+			data.Avg += val.Sor / n
 		}
 		out[k] = data
 	}

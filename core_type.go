@@ -133,6 +133,11 @@ type OldEnemyDetails []OldEnemyDetail
 
 type RelativeSor struct {
 	Player model.Player `json:"Player,omitempty"`
-	Sor    float64      `json:"Sor,omitempty"`
-	Max    float64      `json:"Max,omitempty"`
+	// 个人成绩
+	Sor float64 `json:"Sor,omitempty"`
+
+	// 平均成绩会用到
+	Avg  float64 `json:"Avg,omitempty"`  // 全部平均
+	Top5 float64 `json:"Top5,omitempty"` // 前5平均, 大于100的取前5%
+	Max  float64 `json:"Max,omitempty"`  // 最大值
 }

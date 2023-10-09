@@ -404,7 +404,7 @@ func (c *Client) GetRelativeSor() (allPlayerSor map[model.SorStatisticsKey][]Rel
 }
 
 func (c *Client) GetAvgRelativeSor() map[model.SorStatisticsKey]RelativeSor {
-	key := fmt.Sprintf("GetRelativeSor")
+	key := fmt.Sprintf("GetAvgRelativeSor")
 	if val, ok := c.cache.Get(key); ok && !c.debug {
 		return val.(map[model.SorStatisticsKey]RelativeSor)
 	}
