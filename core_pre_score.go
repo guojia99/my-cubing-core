@@ -97,3 +97,13 @@ func (c *Client) getPreScoresByContest(contestID uint) ([]model.PreScore, error)
 	err = c.db.Where("contest_id = ?", contestID).Find(&out).Error
 	return out, err
 }
+
+func (c *Client) getPreScoresByPlayer(playerID uint) ([]model.PreScore, error) {
+	var (
+		err error
+		out []model.PreScore
+	)
+
+	err = c.db.Where("player_id = ?", playerID).Find(&out).Error
+	return out, err
+}

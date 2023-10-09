@@ -43,6 +43,7 @@ type ScoreCore interface {
 	AddPreScore(AddPreScoreRequest) error                                               // 添加一个预录入的成绩
 	ProcessPreScore(ProcessPreScoreRequest) error                                       // 处理一个预录入的成绩
 	GetPreScores(page, size int, useFinal, final bool) (int64, []model.PreScore, error) // 获取预录入的成绩列表(分页), useFinal表示是否使用final筛选字段
+	GetPreScoresByPlayer(playerID uint) ([]model.PreScore, error)                       // 按玩家获取
 	GetPreScoresByContest(contestID uint) ([]model.PreScore, error)                     // 按比赛获取
 }
 

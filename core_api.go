@@ -87,6 +87,10 @@ func (c *Client) GetPreScores(page, size int, useFinal, final bool) (int64, []mo
 	return c.getPreScores(page, size, useFinal, final)
 }
 
+func (c *Client) GetPreScoresByPlayer(playerID uint) ([]model.PreScore, error) {
+	return c.getPreScoresByPlayer(playerID)
+}
+
 func (c *Client) GetPreScoresByContest(contestID uint) ([]model.PreScore, error) {
 	return c.getPreScoresByContest(contestID)
 }
