@@ -20,6 +20,7 @@ var Models = []interface{}{
 	&Round{},
 	&Player{},
 	&Score{},
+	&PreScore{},
 	&Record{},
 	&PlayerUser{},
 }
