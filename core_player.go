@@ -338,8 +338,8 @@ func (c *Client) getPlayerSor(playerID uint) (single, avg map[model.SorStatistic
 }
 
 // 获取宿敌信息
-func (c *Client) getPlayerOldEnemy(playerId uint) OldEnemyDetails {
-	var out = make(OldEnemyDetails, 0)
+func (c *Client) getPlayerNemesis(playerId uint) NemesisDetails {
+	var out = make(NemesisDetails, 0)
 
 	var player model.Player
 	if err := c.db.First(&player, "id = ?", playerId).Error; err != nil {
@@ -425,7 +425,7 @@ loop:
 			}
 		}
 
-		out = append(out, OldEnemyDetail{
+		out = append(out, NemesisDetail{
 			Player: p,
 			Single: otherBest,
 			Avg:    otherAvg,

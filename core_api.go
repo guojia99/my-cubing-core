@@ -208,13 +208,13 @@ func (c *Client) GetPlayerSor(playerId uint) (single, avg map[model.SorStatistic
 	return
 }
 
-func (c *Client) GetPlayerOldEnemy(playerId uint) OldEnemyDetails {
-	key := fmt.Sprintf("GetPlayerOldEnemy_%v", playerId)
+func (c *Client) GetPlayerNemesis(playerID uint) NemesisDetails {
+	key := fmt.Sprintf("GetPlayerNemesis_%v", playerID)
 	if val, ok := c.cache.Get(key); ok && !c.debug {
-		return val.(OldEnemyDetails)
+		return val.(NemesisDetails)
 	}
 
-	out := c.getPlayerOldEnemy(playerId)
+	out := c.getPlayerNemesis(playerID)
 	_ = c.cache.Add(key, out, c.cacheTime)
 	return out
 }

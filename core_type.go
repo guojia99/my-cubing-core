@@ -123,13 +123,13 @@ type PlayerDetail struct {
 	RecoveryNumber      int `json:"RecoveryNumber,omitempty"`
 }
 
-type OldEnemyDetail struct {
+type NemesisDetail struct {
 	Player model.Player                  `json:"Player,omitempty"`
 	Single map[model.Project]model.Score `json:"Single,omitempty"`
 	Avg    map[model.Project]model.Score `json:"Avg,omitempty"`
 }
 
-type OldEnemyDetails []OldEnemyDetail
+type NemesisDetails []NemesisDetail
 
 type RelativeSor struct {
 	Player model.Player `json:"Player,omitempty"`

@@ -58,7 +58,7 @@ type PlayerCore interface {
 	GetPlayerRecord(playerID uint) []RecordMessage                                              // 获取玩家记录
 	GetPlayerScore(playerID uint) (bestSingle, bestAvg []model.Score, scores []ScoresByContest) // 获取玩家所有成绩
 	GetPlayerSor(playerID uint) (single, avg map[model.SorStatisticsKey]SorScore)               // 获取玩家sor信息
-	GetPlayerOldEnemy(playerID uint) OldEnemyDetails                                            // 获取玩家宿敌信息
+	GetPlayerNemesis(playerID uint) NemesisDetails                                              // 获取玩家宿敌信息
 	GetPlayerRelativeSor(playerID uint) map[model.SorStatisticsKey]RelativeSor                  // 获取单个玩家的相对排位分
 }
 
