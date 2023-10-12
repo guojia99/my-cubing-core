@@ -29,7 +29,7 @@ var defaultProjectRounds = func() []CreateContestRequestRound {
 func (c *Client) addContest(req AddContestRequest) error {
 	var contest model.Contest
 	if err := c.db.Where("name = ?", req.Name).First(&contest).Error; err == nil {
-		return errors.New("name error")
+		return fmt.Errorf("名字重复")
 	}
 
 	contest = model.Contest{
@@ -89,7 +89,7 @@ func (c *Client) removeContest(contestId uint) error {
 		return err
 	}
 	if count > 0 {
-		return errors.New("the contest has score, can't not delete")
+		return errors.New("存在成绩的比赛无法删除")
 	}
 
 	err := c.db.Delete(&contest).Error

@@ -16,7 +16,7 @@ func (c *Client) addScore(playerID uint, contestID uint, project model.Project, 
 	// 1. 确定比赛是否存在
 	var contest model.Contest
 	if err = c.db.Where("id = ?", contestID).First(&contest).Error; err != nil || contest.IsEnd {
-		return fmt.Errorf("the contest id end or error %+v", err)
+		return fmt.Errorf("比赛不存在或已经结束")
 	}
 
 	// 2. 获取轮次信息
