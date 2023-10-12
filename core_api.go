@@ -136,17 +136,7 @@ func (c *Client) GetPlayer(playerId uint) (PlayerDetail, error) {
 }
 
 func (c *Client) GetPlayers(page, size int) (int64, []model.Player, error) {
-	key := fmt.Sprintf("GetPlayers_%v_%v", page, size)
-	if val, ok := c.cache.Get(key); ok && !c.debug {
-		result := val.([2]any)
-		return result[0].(int64), result[1].([]model.Player), nil
-	}
-
 	count, out, err := c.getPlayers(page, size)
-	if err != nil {
-		return count, out, err
-	}
-	_ = c.cache.Add(key, [2]any{count, out}, c.cacheTime)
 	return count, out, err
 }
 
@@ -249,31 +239,12 @@ func (c *Client) RemoveContest(contestId uint) error {
 }
 
 func (c *Client) GetContest(contestId uint) (contest model.Contest, err error) {
-	key := fmt.Sprintf("GetContest_%v", contestId)
-	if val, ok := c.cache.Get(key); ok && !c.debug {
-		return val.(model.Contest), nil
-	}
-
 	contest, err = c.getContest(contestId)
-	if err != nil {
-		return
-	}
-	_ = c.cache.Add(key, contest, c.cacheTime)
 	return
 }
 
 func (c *Client) GetContests(page, size int, typ string) (int64, []model.Contest, error) {
-	key := fmt.Sprintf("GetContests_%v_%v_%v", page, size, typ)
-	if val, ok := c.cache.Get(key); ok && !c.debug {
-		result := val.([2]any)
-		return result[0].(int64), result[1].([]model.Contest), nil
-	}
-
 	count, contests, err := c.getContests(page, size, typ)
-	if err != nil {
-		return count, contests, err
-	}
-	_ = c.cache.Add(key, [2]any{count, contests}, c.cacheTime)
 	return count, contests, err
 }
 
