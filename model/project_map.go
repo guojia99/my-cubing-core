@@ -65,12 +65,12 @@ const (
 	XCube222Minx         Project = "222minx"
 
 	// 数独系列
-	XCubeSuDuKuVeryEasy Project = "suduku_very_easy"
-	XCubeSuDuKuEasy     Project = "suduku_easy"
-	XCubeSuDuKuModerate Project = "suduku_moderate"
-	XCubeSuDuKuAdvanced Project = "suduku_advanced"
-	XCubeSuDuKuHard     Project = "suduku_hard"
-	XCubeSuDuKuMaster   Project = "suduku_master"
+	XCubeSuDoKuVeryEasy Project = "sudoku_very_easy"
+	XCubeSuDoKuEasy     Project = "sudoku_easy"
+	XCubeSuDoKuModerate Project = "sudoku_moderate"
+	XCubeSuDoKuAdvanced Project = "sudoku_advanced"
+	XCubeSuDoKuHard     Project = "sudoku_hard"
+	XCubeSuDoKuMaster   Project = "sudoku_master"
 
 	// 数字华容道系列
 	XCube8Puzzle  Project = "8puzzle"
@@ -139,12 +139,12 @@ var projectsItems = []projectItem{
 	{Project: XCubeMapleLeaf, Cn: "枫叶魔方", RouteType: RouteType5RoundsAvgHT, IsWca: false},
 	{Project: XCube222Minx, Cn: "二阶五魔", RouteType: RouteType5RoundsAvgHT, IsWca: false},
 
-	{Project: XCubeSuDuKuVeryEasy, Cn: "数独入门", RouteType: RouteType5RoundsAvgHT, IsWca: false},
-	{Project: XCubeSuDuKuEasy, Cn: "数独初级", RouteType: RouteType5RoundsAvgHT, IsWca: false},
-	{Project: XCubeSuDuKuModerate, Cn: "数独中级", RouteType: RouteType5RoundsAvgHT, IsWca: false},
-	{Project: XCubeSuDuKuAdvanced, Cn: "数独高级", RouteType: RouteType3roundsBest, IsWca: false},
-	{Project: XCubeSuDuKuHard, Cn: "数独困难", RouteType: RouteType3roundsBest, IsWca: false},
-	{Project: XCubeSuDuKuMaster, Cn: "数独大师", RouteType: RouteType3roundsBest, IsWca: false},
+	{Project: XCubeSuDoKuVeryEasy, Cn: "数独入门", RouteType: RouteType5RoundsAvgHT, IsWca: false},
+	{Project: XCubeSuDoKuEasy, Cn: "数独初级", RouteType: RouteType5RoundsAvgHT, IsWca: false},
+	{Project: XCubeSuDoKuModerate, Cn: "数独中级", RouteType: RouteType5RoundsAvgHT, IsWca: false},
+	{Project: XCubeSuDoKuAdvanced, Cn: "数独高级", RouteType: RouteType3roundsBest, IsWca: false},
+	{Project: XCubeSuDoKuHard, Cn: "数独困难", RouteType: RouteType3roundsBest, IsWca: false},
+	{Project: XCubeSuDoKuMaster, Cn: "数独大师", RouteType: RouteType3roundsBest, IsWca: false},
 
 	{Project: XCube8Puzzle, Cn: "3阶数字华容道", RouteType: RouteType5RoundsAvgHT, IsWca: false},
 	{Project: XCube15Puzzle, Cn: "4阶数字华容道", RouteType: RouteType5RoundsAvgHT, IsWca: false},
