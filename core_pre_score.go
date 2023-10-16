@@ -80,11 +80,11 @@ func (c *Client) getPreScores(page, size int, final Bool) (int64, []model.PreSco
 
 	if final > NotBool {
 		err = c.db.Where("finish = ?", final == TrueBool).Offset(offset).Limit(limit).Find(&out).Error
-		c.db.Where("finish = ?", final).Count(&count)
+		c.db.Model(&model.PreScore{}).Where("finish = ?", final).Count(&count)
 		return count, out, err
 	}
 	err = c.db.Offset(offset).Limit(limit).Find(&out).Error
-	c.db.Count(&count)
+	c.db.Model(&model.PreScore{}).Count(&count)
 	return count, out, err
 }
 
@@ -107,11 +107,11 @@ func (c *Client) getPreScoresByContest(contestID uint, page, size int, final Boo
 
 	if final > NotBool {
 		err = c.db.Where("contest_id = ?", contestID).Where("finish = ?", final == TrueBool).Offset(offset).Limit(limit).Find(&out).Error
-		c.db.Where("contest_id = ?", contestID).Where("finish = ?", final == TrueBool).Count(&count)
+		c.db.Model(&model.PreScore{}).Where("contest_id = ?", contestID).Where("finish = ?", final == TrueBool).Count(&count)
 		return count, out, err
 	}
-	err = c.db.Offset(offset).Limit(limit).Find(&out).Error
-	c.db.Count(&count)
+	err = c.db.Where("contest_id = ?", contestID).Offset(offset).Limit(limit).Find(&out).Error
+	c.db.Model(&model.PreScore{}).Where("contest_id = ?", contestID).Count(&count)
 	return count, out, err
 }
 
@@ -134,10 +134,10 @@ func (c *Client) getPreScoresByPlayer(playerID uint, page, size int, final Bool)
 
 	if final > NotBool {
 		err = c.db.Where("player_id = ?", playerID).Where("finish = ?", final == TrueBool).Offset(offset).Limit(limit).Find(&out).Error
-		c.db.Where("player_id = ?", playerID).Where("finish = ?", final == TrueBool).Count(&count)
+		c.db.Model(&model.PreScore{}).Where("player_id = ?", playerID).Where("finish = ?", final == TrueBool).Count(&count)
 		return count, out, err
 	}
 	err = c.db.Offset(offset).Limit(limit).Find(&out).Error
-	c.db.Count(&count)
+	c.db.Model(&model.PreScore{}).Where("player_id = ?", playerID).Count(&count)
 	return count, out, err
 }
