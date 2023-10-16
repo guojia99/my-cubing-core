@@ -16,12 +16,12 @@ const (
 
 type (
 	AddScoreRequest struct {
-		PlayerID  uint
-		ContestID uint
-		Project   model.Project
-		RoundId   uint
-		Result    []float64
-		Penalty   model.ScorePenalty
+		PlayerID  uint               `json:"PlayerID"`
+		ContestID uint               `json:"ContestID"`
+		Project   model.Project      `json:"Project"`
+		RoundId   uint               `json:"RoundId"`
+		Result    []float64          `json:"Result"`
+		Penalty   model.ScorePenalty `json:"Penalty"`
 	}
 
 	CreateContestRequestRound struct {
@@ -45,8 +45,8 @@ type (
 
 	AddPreScoreRequest struct {
 		AddScoreRequest
-		Source   string
-		Recorder string
+		Source   string `json:"Source"`
+		Recorder string `json:"Recorder"`
 	}
 
 	ProcessPreScoreRequest struct {
