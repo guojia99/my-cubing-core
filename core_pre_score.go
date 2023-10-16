@@ -80,7 +80,7 @@ func (c *Client) getPreScores(page, size int, final Bool) (int64, []model.PreSco
 
 	if final > NotBool {
 		err = c.db.Where("finish = ?", final == TrueBool).Offset(offset).Limit(limit).Find(&out).Error
-		c.db.Model(&model.PreScore{}).Where("finish = ?", final).Count(&count)
+		c.db.Model(&model.PreScore{}).Where("finish = ?", final == TrueBool).Count(&count)
 		return count, out, err
 	}
 	err = c.db.Offset(offset).Limit(limit).Find(&out).Error
