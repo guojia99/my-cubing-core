@@ -30,6 +30,7 @@ func NewCore(db *gorm.DB, debug bool, cacheTime time.Duration) Core {
 type Core interface {
 	ScoreCore
 	PlayerCore
+	PlayerUserCore
 	ContestCore
 	StatisticalCore
 }
@@ -60,6 +61,12 @@ type PlayerCore interface {
 	GetPlayerSor(playerID uint) (single, avg map[model.SorStatisticsKey]SorScore)               // 获取玩家sor信息
 	GetPlayerNemesis(playerID uint) NemesisDetails                                              // 获取玩家宿敌信息
 	GetPlayerRelativeSor(playerID uint) map[model.SorStatisticsKey]RelativeSor                  // 获取单个玩家的相对排位分
+}
+
+type PlayerUserCore interface {
+	GetPlayerUser(player model.Player) model.PlayerUser                // 获取一个玩家的用户信息
+	AddPlayerUser(player model.Player, user model.PlayerUser) error    // 添加一个用户信息
+	UpdatePlayerUser(player model.Player, user model.PlayerUser) error // 更新一个用户信息
 }
 
 type ContestCore interface {

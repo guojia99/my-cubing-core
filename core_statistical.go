@@ -106,6 +106,7 @@ func (c *Client) getBestScoreByProject(project model.Project) (bestSingle, bestA
 	return b[project], a[project]
 }
 
+// getAllProjectBestScores 获取所有项目各自的最佳成绩(最新的成绩为准)
 func (c *Client) getAllProjectBestScores() (bestSingle, bestAvg map[model.Project]model.Score) {
 	bestSingle, bestAvg = make(map[model.Project]model.Score), make(map[model.Project]model.Score)
 

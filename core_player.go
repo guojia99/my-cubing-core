@@ -463,3 +463,32 @@ func (c *Client) getPlayerRelativeSor(playerID uint) map[model.SorStatisticsKey]
 	}
 	return out
 }
+
+func (c *Client) getPlayerUser(player model.Player) model.PlayerUser {
+	var out model.PlayerUser
+	c.db.First(&out, "player_id = ?", player.ID)
+	return out
+}
+
+func (c *Client) addPlayerUser(player model.Player, user model.PlayerUser) error {
+	if val := c.getPlayerUser(player); val.PlayerID != 0 {
+		return c.updatePlayerUser(player, user)
+	}
+	user.PlayerID = player.ID
+	if !user.Valid() {
+		return errors.New("校验错误")
+	}
+	return c.db.Create(user).Error
+}
+
+func (c *Client) updatePlayerUser(player model.Player, user model.PlayerUser) error {
+	if val := c.getPlayerUser(player); val.PlayerID == 0 {
+		return errors.New("玩家不存在")
+	}
+
+	user.PlayerID = player.ID
+	if !user.Valid() {
+		return errors.New("校验错误")
+	}
+	return c.db.Save(&user).Error
+}

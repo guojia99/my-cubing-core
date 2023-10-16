@@ -385,3 +385,17 @@ func (c *Client) GetAvgRelativeSor() map[model.SorStatisticsKey]RelativeSor {
 	return out
 
 }
+
+// player user
+
+func (c *Client) GetPlayerUser(player model.Player) model.PlayerUser {
+	return c.getPlayerUser(player)
+}
+
+func (c *Client) AddPlayerUser(player model.Player, user model.PlayerUser) error {
+	return c.addPlayerUser(player, user)
+}
+
+func (c *Client) UpdatePlayerUser(player model.Player, user model.PlayerUser) error {
+	return c.updatePlayerUser(player, user)
+}
