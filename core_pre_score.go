@@ -59,6 +59,7 @@ func (c *Client) addPreScore(request AddPreScoreRequest) error {
 			Result5:    request.Result[4],
 		},
 		ContestName: contest.Name,
+		RoundName:   round.Name,
 		Recorder:    request.Recorder,
 		Source:      request.Source,
 	}
@@ -115,10 +116,11 @@ func (c *Client) getPreScores(page, size int, final Bool) (int64, []model.PreSco
 	if final > NotBool {
 		err = c.db.Where("finish = ?", final == TrueBool).Offset(offset).Limit(limit).Find(&out).Error
 		c.db.Model(&model.PreScore{}).Where("finish = ?", final == TrueBool).Count(&count)
-		return count, out, err
+	} else {
+		err = c.db.Offset(offset).Limit(limit).Find(&out).Error
+		c.db.Model(&model.PreScore{}).Count(&count)
 	}
-	err = c.db.Offset(offset).Limit(limit).Find(&out).Error
-	c.db.Model(&model.PreScore{}).Count(&count)
+
 	return count, out, err
 }
 

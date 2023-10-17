@@ -44,13 +44,13 @@ type PlayerUser struct {
 	IsAdmin      bool `json:"isAdmin"`      // 是否为普通管理员
 	IsSuperAdmin bool `json:"isSuperAdmin"` // 是否为超级管理员
 
-	LoginID  string `gorm:"unique;not null"`                  // 登录自定义ID
+	LoginID  string `gorm:"column:login_id"`                  // 登录自定义ID
 	PlayerID uint   `gorm:"unique;not null;column:player_id"` // 选手ID
-	Password string `json:"-" gorm:"unique;null"`             // 密码 md5加密校验
+	Password string `json:"-" gorm:""`                        // 密码 md5加密校验
 
-	QQ     string `json:"-" gorm:"unique;null"` // qq号
-	WeChat string `json:"-" gorm:"unique;null"` // 微信号
-	Plone  string `json:"-" gorm:"unique;null"` // 手机号
+	QQ     string `json:"-" gorm:"column:qq"`     // qq号
+	WeChat string `json:"-" gorm:"column:wechat"` // 微信号
+	Phone  string `json:"-" gorm:"column:phone"`  // 手机号
 }
 
 func (p PlayerUser) Valid() bool {

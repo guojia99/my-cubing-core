@@ -471,18 +471,11 @@ func (c *Client) getPlayerUser(player model.Player) model.PlayerUser {
 }
 
 func (c *Client) addPlayerUser(player model.Player, user model.PlayerUser) error {
-	if val := c.getPlayerUser(player); val.PlayerID != 0 {
-		return c.updatePlayerUser(player, user)
-	}
-	user.PlayerID = player.ID
-	if !user.Valid() {
-		return errors.New("校验错误")
-	}
-	return c.db.Create(user).Error
+	return c.UpdatePlayerUser(player, user)
 }
 
 func (c *Client) updatePlayerUser(player model.Player, user model.PlayerUser) error {
-	if val := c.getPlayerUser(player); val.PlayerID == 0 {
+	if err := c.db.First(&player, "id = ?", player.ID).Error; err != nil {
 		return errors.New("玩家不存在")
 	}
 
@@ -490,5 +483,16 @@ func (c *Client) updatePlayerUser(player model.Player, user model.PlayerUser) er
 	if !user.Valid() {
 		return errors.New("校验错误")
 	}
-	return c.db.Save(&user).Error
+
+	var err error
+	if playerUser := c.getPlayerUser(player); playerUser.ID == 0 { // 创建
+		err = c.db.Create(&user).Error
+	} else { //更新
+		playerUser.QQ = user.QQ
+		playerUser.WeChat = user.WeChat
+		playerUser.Phone = user.Phone
+		playerUser.LoginID = user.LoginID
+		err = c.db.Save(&playerUser).Error
+	}
+	return err
 }
