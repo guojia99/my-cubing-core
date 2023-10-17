@@ -13,22 +13,33 @@ func (c *Client) addPreScore(request AddPreScoreRequest) error {
 		request.Result = append(request.Result, model.DNF)
 	}
 
+	// 基本数据校验
 	var player model.Player
 	if err := c.db.First(&player, "id = ?", request.PlayerID).Error; err != nil {
 		return errors.New("找不到选手")
 	}
-
 	var contest model.Contest
 	if err := c.db.First(&contest, "id = ?", request.ContestID).Error; err != nil {
 		return errors.New("找不到比赛")
 	}
+	var round model.Round
+	if err := c.db.First(&round, "id = ?", request.RoundId).Error; err != nil {
+		return errors.New("找不到该轮次")
+	}
+	if round.ContestID != contest.ID {
+		return errors.New("该轮次和比赛无法对应")
+	}
+	if round.Project != request.Project {
+		return errors.New("该轮次和项目无法对应")
+	}
 
+	// 查询预录入数据
 	var preScore model.PreScore
 	err := c.db.Where("player_id = ?", request.PlayerID).
 		Where("contest_id = ?", request.ContestID).
 		Where("route_id = ?", request.RoundId).
 		Where("project = ?", request.Project).
-		First(&preScore)
+		First(&preScore).Error
 	if err == nil && preScore.ID != 0 {
 		return errors.New("该预录入成绩已存在")
 	}
