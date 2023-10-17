@@ -9,6 +9,7 @@ const (
 type PreScore struct {
 	Score
 
+	ContestName  string `json:"contestName" gorm:"column:contest_name"`   // 比赛名称
 	Recorder     string `json:"recorder" gorm:"column:recorder"`          // 记录人
 	Processor    string `json:"processor" gorm:"column:processor"`        // 处理人
 	Finish       bool   `json:"finish" gorm:"column:finish"`              // 是否处理

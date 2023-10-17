@@ -12,24 +12,46 @@ func (c *Client) addPreScore(request AddPreScoreRequest) error {
 	for len(request.Result) < 5 {
 		request.Result = append(request.Result, model.DNF)
 	}
-	preScore := model.PreScore{
+
+	var player model.Player
+	if err := c.db.First(&player, "id = ?", request.PlayerID).Error; err != nil {
+		return errors.New("找不到选手")
+	}
+
+	var contest model.Contest
+	if err := c.db.First(&contest, "id = ?", request.ContestID).Error; err != nil {
+		return errors.New("找不到比赛")
+	}
+
+	var preScore model.PreScore
+	err := c.db.Where("player_id = ?", request.PlayerID).
+		Where("contest_id = ?", request.ContestID).
+		Where("route_id = ?", request.RoundId).
+		Where("project = ?", request.Project).
+		First(&preScore)
+	if err == nil && preScore.ID != 0 {
+		return errors.New("该预录入成绩已存在")
+	}
+
+	preScore = model.PreScore{
 		Score: model.Score{
-			PlayerID:  request.PlayerID,
-			ContestID: request.ContestID,
-			RouteID:   request.RoundId,
-			Project:   request.Project,
-			Result1:   request.Result[0],
-			Result2:   request.Result[1],
-			Result3:   request.Result[2],
-			Result4:   request.Result[3],
-			Result5:   request.Result[4],
+			PlayerID:   request.PlayerID,
+			PlayerName: player.Name,
+			ContestID:  request.ContestID,
+			RouteID:    request.RoundId,
+			Project:    request.Project,
+			Result1:    request.Result[0],
+			Result2:    request.Result[1],
+			Result3:    request.Result[2],
+			Result4:    request.Result[3],
+			Result5:    request.Result[4],
 		},
-		Recorder: request.Recorder,
-		Source:   request.Source,
+		ContestName: contest.Name,
+		Recorder:    request.Recorder,
+		Source:      request.Source,
 	}
 
 	preScore.Penalty, _ = jsoniter.MarshalToString(request.Penalty)
-
 	return c.db.Create(&preScore).Error
 }
 
