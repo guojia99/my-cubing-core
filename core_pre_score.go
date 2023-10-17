@@ -39,8 +39,9 @@ func (c *Client) addPreScore(request AddPreScoreRequest) error {
 		Where("contest_id = ?", request.ContestID).
 		Where("route_id = ?", request.RoundId).
 		Where("project = ?", request.Project).
+		Order("created_at DESC").
 		First(&preScore).Error
-	if err == nil && preScore.ID != 0 {
+	if err == nil && preScore.ID != 0 && !preScore.Finish {
 		return errors.New("该预录入成绩已存在")
 	}
 
