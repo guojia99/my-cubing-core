@@ -305,3 +305,23 @@ func (c *Client) getContestRecord(contestID uint) []RecordMessage {
 	}
 	return out
 }
+
+func (c *Client) getAllContestStatics() (out []ContestStatics) {
+	var contests []model.Contest
+	_ = c.db.Find(&contests)
+
+	for _, contest := range contests {
+		var playerIDs []uint64
+		c.db.Model(&model.Score{}).Distinct("player_id").Where("contest_id = ?", contest).Pluck("player_id", &playerIDs)
+
+		var projects []model.Project
+		c.db.Model(&model.Score{}).Distinct("project").Where("contest_id = ?", contest).Pluck("project", &projects)
+
+		out = append(out, ContestStatics{
+			Contest:    contest,
+			PlayerNum:  len(playerIDs),
+			ProjectNum: len(projects),
+		})
+	}
+	return out
+}

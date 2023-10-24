@@ -141,3 +141,10 @@ type RelativeSor struct {
 	Top5 float64 `json:"Top5,omitempty"` // 前5平均, 大于100的取前5%
 	Max  float64 `json:"Max,omitempty"`  // 最大值
 }
+
+type ContestStatics struct {
+	model.Contest
+
+	PlayerNum  int `json:"PlayerNum"`
+	ProjectNum int `json:"ProjectNum"`
+}

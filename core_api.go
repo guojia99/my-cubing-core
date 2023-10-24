@@ -293,6 +293,17 @@ func (c *Client) GetContestRecord(contestId uint) []RecordMessage {
 	return out
 }
 
+func (c *Client) GetAllContestStatics() (contests []ContestStatics) {
+	key := fmt.Sprintf("GetAllContestStatics")
+	if val, ok := c.cache.Get(key); ok && !c.debug {
+		return val.([]ContestStatics)
+	}
+
+	out := c.getAllContestStatics()
+	_ = c.cache.Add(key, out, c.cacheTime)
+	return out
+}
+
 // st core
 
 func (c *Client) GetRecords(page, size int) (int64, []model.Record, error) {

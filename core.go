@@ -72,6 +72,7 @@ type PlayerUserCore interface {
 type ContestCore interface {
 	AddContest(AddContestRequest) error                                               // 添加比赛
 	RemoveContest(contestId uint) error                                               // 删除比赛
+	GetAllContestStatics() (contests []ContestStatics)                                // 所有比赛的数据统计
 	GetContest(contestId uint) (contest model.Contest, err error)                     // 获取信息
 	GetContests(page, size int, typ string) (int64, []model.Contest, error)           // 获取比赛列表 （分页）
 	GetContestSor(contestID uint) (single, avg map[model.SorStatisticsKey][]SorScore) // 获取比赛sor排名
