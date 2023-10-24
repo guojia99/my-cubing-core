@@ -1,7 +1,11 @@
 package core
 
 import (
+	"context"
+	"time"
+
 	"github.com/guojia99/my-cubing-core/model"
+	"github.com/guojia99/my-cubing-core/utils"
 )
 
 func (c *Client) getRecords(page, size int) (int64, []model.Record, error) {
@@ -165,6 +169,29 @@ func (c *Client) getPodiums() []Podiums {
 		pd.PodiumsResults = nil
 		out = append(out, pd)
 	}
+	SortPodiums(out)
+	return out
+}
+
+func (c *Client) getPodiumsByGo() []Podiums {
+	var players []model.Player
+	_ = c.db.Find(&players)
+	var out = make([]Podiums, len(players))
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+
+	var fns []utils.MultiGoFn
+	fn := func(ctx context.Context, idx int) {
+		pd := c.getPlayerPodiums(players[idx].ID)
+		pd.PodiumsResults = nil
+		out[idx] = pd
+	}
+	for i := 0; i < len(players); i++ {
+		fns = append(fns, fn)
+	}
+	utils.MultiGo(ctx, fns)
+
 	SortPodiums(out)
 	return out
 }
