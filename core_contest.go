@@ -312,10 +312,10 @@ func (c *Client) getAllContestStatics() (out []ContestStatics) {
 
 	for _, contest := range contests {
 		var playerIDs []uint64
-		c.db.Model(&model.Score{}).Distinct("player_id").Where("contest_id = ?", contest).Pluck("player_id", &playerIDs)
+		c.db.Model(&model.Score{}).Distinct("player_id").Where("contest_id = ?", contest.ID).Pluck("player_id", &playerIDs)
 
 		var projects []model.Project
-		c.db.Model(&model.Score{}).Distinct("project").Where("contest_id = ?", contest).Pluck("project", &projects)
+		c.db.Model(&model.Score{}).Distinct("project").Where("contest_id = ?", contest.ID).Pluck("project", &projects)
 
 		out = append(out, ContestStatics{
 			Contest:    contest,
