@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/guojia99/my-cubing-core/model"
@@ -58,19 +59,15 @@ func (c *Client) getBestScore() (bestSingle, bestAvg map[model.Project][]model.S
 	c.db.Find(&allScore)
 
 	// key 是 project + playerID
-	var singleCache = make(map[ProjectPlayer]model.Score, len(players)*64)
-	var avgCache = make(map[ProjectPlayer]model.Score, len(players)*64)
+	var singleCache = make(map[string]model.Score)
+	var avgCache = make(map[string]model.Score)
 
 	// todo 分片
 	for _, score := range allScore {
-		key := ProjectPlayer{PlayerID: score.PlayerID, Project: score.Project}
+		key := fmt.Sprintf("%d_%s", score.PlayerID, score.Project)
 
-		if single, ok := singleCache[key]; ok {
-			if score.IsBestScore(single) {
-				singleCache[key] = score
-			}
-		} else {
-			singleCache[key] = single
+		if _, ok := singleCache[key]; !ok || score.IsBestScore(singleCache[key]) {
+			singleCache[key] = score
 		}
 
 		switch score.Project.RouteType() {
@@ -78,18 +75,14 @@ func (c *Client) getBestScore() (bestSingle, bestAvg map[model.Project][]model.S
 			continue
 		}
 
-		if avg, ok := avgCache[key]; ok {
-			if score.IsBestAvgScore(avg) {
-				avgCache[key] = score
-			}
-		} else {
+		if _, ok := avgCache[key]; !ok || score.IsBestAvgScore(avgCache[key]) {
 			avgCache[key] = score
 		}
 	}
 
 	for _, project := range model.AllProjectRoute() {
 		for _, player := range players {
-			key := ProjectPlayer{PlayerID: player.ID, Project: project}
+			key := fmt.Sprintf("%d_%s", player.ID, project)
 
 			if single, ok := singleCache[key]; ok {
 				bestSingle[project] = append(bestSingle[project], single)
