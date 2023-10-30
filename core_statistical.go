@@ -54,54 +54,51 @@ func (c *Client) getBestScore() (bestSingle, bestAvg map[model.Project][]model.S
 		bestAvg[project] = make([]model.Score, 0)
 	}
 
+	var allScore []model.Score
+	c.db.Find(&allScore)
+
+	// key 是 project + playerID
+	var singleCache = make(map[ProjectPlayer]model.Score, len(players)*64)
+	var avgCache = make(map[ProjectPlayer]model.Score, len(players)*64)
+
+	// todo 分片
+	for _, score := range allScore {
+		key := ProjectPlayer{PlayerID: score.PlayerID, Project: score.Project}
+
+		if single, ok := singleCache[key]; ok {
+			if score.IsBestScore(single) {
+				singleCache[key] = score
+			}
+		} else {
+			singleCache[key] = single
+		}
+
+		switch score.Project.RouteType() {
+		case model.RouteType1rounds, model.RouteTypeRepeatedly:
+			continue
+		}
+
+		if avg, ok := avgCache[key]; ok {
+			if score.IsBestAvgScore(avg) {
+				avgCache[key] = score
+			}
+		} else {
+			avgCache[key] = score
+		}
+	}
+
 	for _, project := range model.AllProjectRoute() {
 		for _, player := range players {
-			var best, avg model.Score
-			if project.RouteType() == model.RouteTypeRepeatedly {
-				if err := c.db.
-					Where("player_id = ?", player.ID).
-					Where("project = ?", project).
-					Where("best > ?", model.DNF).
-					Order("best DESC").
-					Order("r1 DESC").
-					Order("r2").
-					Order("r3").
-					First(&best).Error; err == nil {
-					var round model.Round
-					c.db.Where("id = ?", best.RouteID).First(&round)
-					best.RouteValue = round
-					bestSingle[project] = append(bestSingle[project], best)
-				}
-				continue
+			key := ProjectPlayer{PlayerID: player.ID, Project: project}
+
+			if single, ok := singleCache[key]; ok {
+				bestSingle[project] = append(bestSingle[project], single)
 			}
-			if err := c.db.
-				Where("player_id = ?", player.ID).
-				Where("project = ?", project).
-				Where("best > ?", model.DNF).
-				Order("best").
-				First(&best).Error; err == nil {
-				var round model.Round
-				c.db.Where("id = ?", best.RouteID).First(&round)
-				best.RouteValue = round
-				bestSingle[project] = append(bestSingle[project], best)
-			}
-			if err := c.db.
-				Where("player_id = ?", player.ID).
-				Where("project = ?", project).
-				Where("avg > ?", model.DNF).
-				Order("avg").
-				First(&avg).Error; err == nil {
-				var round model.Round
-				c.db.Where("id = ?", avg.RouteID).First(&round)
-				avg.RouteValue = round
+			if avg, ok := avgCache[key]; ok {
 				bestAvg[project] = append(bestAvg[project], avg)
 			}
 		}
-
-		model.SortByBest(bestSingle[project])
-		model.SortByAvg(bestAvg[project])
 	}
-
 	return
 }
 

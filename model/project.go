@@ -43,6 +43,7 @@ func (r RouteType) String() string {
 func AllProjectRoute() []Project       { return allProjectRoute }
 func WCAProjectRoute() []Project       { return wcaProjectRoute }
 func XCubeProjectRoute() []Project     { return xCubeProjectRoute }
+func (p Project) String() string       { return string(p) }
 func (p Project) Cn() string           { return projectItemsMap[p].Cn }
 func (p Project) RouteType() RouteType { return projectItemsMap[p].RouteType }
 func (p Project) IsWca() bool          { return projectItemsMap[p].IsWca }
