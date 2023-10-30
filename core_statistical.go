@@ -98,6 +98,9 @@ func (c *Client) getBestScore() (bestSingle, bestAvg map[model.Project][]model.S
 				bestAvg[project] = append(bestAvg[project], avg)
 			}
 		}
+
+		model.SortByBest(bestSingle[project])
+		model.SortByAvg(bestAvg[project])
 	}
 	return
 }
