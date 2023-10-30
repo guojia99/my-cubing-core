@@ -84,10 +84,10 @@ func (c *Client) getBestScore() (bestSingle, bestAvg map[model.Project][]model.S
 		for _, player := range players {
 			key := fmt.Sprintf("%d_%s", player.ID, project)
 
-			if single, ok := singleCache[key]; ok {
+			if single, ok := singleCache[key]; ok && !single.DBest() {
 				bestSingle[project] = append(bestSingle[project], single)
 			}
-			if avg, ok := avgCache[key]; ok {
+			if avg, ok := avgCache[key]; ok && !avg.DAvg() {
 				bestAvg[project] = append(bestAvg[project], avg)
 			}
 		}
