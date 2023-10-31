@@ -1,12 +1,29 @@
 package core
 
 import (
+	"fmt"
 	"sort"
 
 	"github.com/guojia99/my-cubing-core/model"
 )
 
-func playerByProjectMap(bestSingle, bestAvg map[model.Project][]model.Score) (singlePlayerDict, avgPlayerDict map[model.Project]map[uint]model.Score) {
+// todo 考虑多线程
+func (c *Client) getContestPlayers(contestID uint, past bool) (playerIDs []uint64, players []model.Player) {
+	conn := "contest_id = ?"
+	if past {
+		conn = "contest_id != ?"
+	}
+
+	// 查这场比赛所有选手
+	if c.db.Model(&model.Score{}).Distinct("player_id").Where(conn, contestID).Pluck("player_id", &playerIDs); len(playerIDs) == 0 {
+		return nil, nil
+	}
+	c.db.Where("id in ?", playerIDs).Find(&players)
+	return
+}
+
+// playerByProjectMap 最佳成绩列表和平均成绩列表制作成基于项目的玩家映射表
+func (c *Client) playerByProjectMap(bestSingle, bestAvg map[model.Project][]model.Score) (singlePlayerDict, avgPlayerDict map[model.Project]map[uint]model.Score) {
 	singlePlayerDict = make(map[model.Project]map[uint]model.Score)
 	avgPlayerDict = make(map[model.Project]map[uint]model.Score)
 
@@ -28,12 +45,11 @@ func playerByProjectMap(bestSingle, bestAvg map[model.Project][]model.Score) (si
 	return
 }
 
-// todo 考虑多线程
 func (c *Client) parserRelativeSor(players []model.Player, bestSingle, bestAvg map[model.Project][]model.Score) (allPlayerSor map[model.SorStatisticsKey][]RelativeSor) {
 	allPlayerSor = make(map[model.SorStatisticsKey][]RelativeSor)
 
-	bestSingle1, bestAvg1 := c.getAllProjectBestScores()                       // 全场最佳的成绩
-	singlePlayerDict, avgPlayerDict := playerByProjectMap(bestSingle, bestAvg) // 个人成绩缓存 map[model.Project]map[uint]model.Score
+	bestSingle1, bestAvg1 := c.getAllProjectBestScores()                         // 全场最佳的成绩
+	singlePlayerDict, avgPlayerDict := c.playerByProjectMap(bestSingle, bestAvg) // 个人成绩缓存 map[model.Project]map[uint]model.Score
 	for sorKey, projects := range model.SorKeyMap() {
 		var playerCache = make(map[uint]*RelativeSor)
 
@@ -103,12 +119,10 @@ func (c *Client) parserRelativeSor(players []model.Player, bestSingle, bestAvg m
 	return
 }
 
-// todo 考虑多线程
-// parserSorSort 解析sor
-func parserSorSort(players []model.Player, bestSingle, bestAvg map[model.Project][]model.Score) (single, avg map[model.SorStatisticsKey][]SorScore) {
+func (c *Client) parserSorSort(players []model.Player, bestSingle, bestAvg map[model.Project][]model.Score) (single, avg map[model.SorStatisticsKey][]SorScore) {
 	single, avg = make(map[model.SorStatisticsKey][]SorScore, len(model.SorKeyMap())), make(map[model.SorStatisticsKey][]SorScore, len(model.SorKeyMap()))
 
-	singlePlayerDict, avgPlayerDict := playerByProjectMap(bestSingle, bestAvg)
+	singlePlayerDict, avgPlayerDict := c.playerByProjectMap(bestSingle, bestAvg)
 
 	for sorKey, projects := range model.SorKeyMap() {
 		var s = make([]SorScore, 0)
@@ -198,128 +212,106 @@ func (c *Client) getContestTop(contestID uint, n int) map[model.Project][]model.
 	return out
 }
 
-// getContestBestSingle 获取比赛每个项目的最佳成绩
+// getContestBestSingle 获取比赛每个项目的最佳成绩, 如果使用 past则不是该成绩
 func (c *Client) getContestBestSingle(contestID uint, past bool) map[model.Project]model.Score {
-	var out = make(map[model.Project]model.Score)
-
 	conn := "contest_id = ?"
 	if past {
 		conn = "contest_id != ?"
 	}
 
-	for _, project := range model.AllProjectRoute() {
-		var score model.Score
-		var err error
+	var allScore []model.Score
+	c.db.Where(conn, contestID).Find(&allScore)
 
-		switch project.RouteType() {
-		case model.RouteTypeRepeatedly:
-			err = c.db.
-				Where(conn, contestID).
-				Where("project = ?", project).
-				Where("best > ?", model.DNF).
-				Order("best DESC").
-				Order("r2").
-				Order("r3").
-				Order("created_at").
-				First(&score).Error
-		default:
-			err = c.db.
-				Where(conn, contestID).
-				Where("project = ?", project).
-				Where("best > ?", model.DNF).
-				Order("best").
-				Order("created_at").
-				First(&score).Error
-		}
-		if err != nil {
-			continue
-		}
-
-		out[project] = score
-	}
-	return out
+	_, players := c.getContestPlayers(contestID, past)
+	single, _ := c.getBestByScores(allScore, players)
+	return single
 }
 
 // getContestBestAvg 获取比赛每个项目的最佳平均成绩
 func (c *Client) getContestBestAvg(contestID uint, past bool) map[model.Project]model.Score {
-	var out = make(map[model.Project]model.Score)
 	conn := "contest_id = ?"
 	if past {
 		conn = "contest_id != ?"
 	}
+
+	var allScore []model.Score
+	c.db.Where(conn, contestID).Find(&allScore)
+
+	_, players := c.getContestPlayers(contestID, past)
+	avg, _ := c.getBestByScores(allScore, players)
+	return avg
+}
+
+func (c *Client) sortByScores(allScore []model.Score, players []model.Player) (bestSingle, bestAvg map[model.Project][]model.Score) {
+	bestSingle, bestAvg = make(map[model.Project][]model.Score), make(map[model.Project][]model.Score)
+
 	for _, project := range model.AllProjectRoute() {
-		var score model.Score
-		if err := c.db.
-			Where(conn, contestID).
-			Where("project = ?", project).
-			Where("avg > ?", model.DNF).
-			Order("avg").
-			Order("created_at").
-			First(&score).Error; err != nil {
+		bestSingle[project] = make([]model.Score, 0)
+		bestAvg[project] = make([]model.Score, 0)
+	}
+
+	// key 是 project + playerID
+	var singleCache = make(map[string]model.Score)
+	var avgCache = make(map[string]model.Score)
+
+	// todo 分片
+	for _, score := range allScore {
+		key := fmt.Sprintf("%d_%s", score.PlayerID, score.Project)
+
+		if _, ok := singleCache[key]; !ok || score.IsBestScore(singleCache[key]) {
+			singleCache[key] = score
+		}
+
+		switch score.Project.RouteType() {
+		case model.RouteType1rounds, model.RouteTypeRepeatedly:
 			continue
 		}
-		out[project] = score
+
+		if _, ok := avgCache[key]; !ok || score.IsBestAvgScore(avgCache[key]) {
+			avgCache[key] = score
+		}
 	}
-	return out
+
+	for _, project := range model.AllProjectRoute() {
+		for _, player := range players {
+			key := fmt.Sprintf("%d_%s", player.ID, project)
+
+			if single, ok := singleCache[key]; ok && !single.DBest() {
+				bestSingle[project] = append(bestSingle[project], single)
+			}
+			if avg, ok := avgCache[key]; ok && !avg.DAvg() {
+				bestAvg[project] = append(bestAvg[project], avg)
+			}
+		}
+
+		model.SortByBest(bestSingle[project])
+		model.SortByAvg(bestAvg[project])
+	}
+	return
+}
+
+func (c *Client) getBestByScores(allScore []model.Score, players []model.Player) (bestSingle, bestAvg map[model.Project]model.Score) {
+	bestSingles, bestAvgs := c.sortByScores(allScore, players)
+
+	bestSingle, bestAvg = make(map[model.Project]model.Score), make(map[model.Project]model.Score)
+
+	for _, pj := range model.AllProjectRoute() {
+		if val, ok := bestSingles[pj]; ok && len(val) > 0 {
+			bestSingle[pj] = val[0]
+		}
+
+		if val, ok := bestAvgs[pj]; ok && len(val) > 0 {
+			bestAvg[pj] = val[0]
+		}
+	}
+	return
 }
 
 // getContestAllBestScores 获取某比赛所有最佳成绩排名
-func (c *Client) getContestAllBestScores(contestID uint) (single, avg map[model.Project][]model.Score) {
-	single = make(map[model.Project][]model.Score)
-	avg = make(map[model.Project][]model.Score)
-
-	// 查这场比赛所有选手
-	var playerIDs []uint64
-	if c.db.Model(&model.Score{}).Distinct("player_id").Where("contest_id = ?", contestID).Pluck("player_id", &playerIDs); len(playerIDs) == 0 {
-		return
-	}
-	var players []model.Player
-	c.db.Where("id in ?", playerIDs).Find(&players)
-
-	for _, project := range model.AllProjectRoute() {
-		single[project] = make([]model.Score, 0)
-		avg[project] = make([]model.Score, 0)
-		for _, player := range players {
-			var b, a model.Score
-			if project.RouteType() == model.RouteTypeRepeatedly {
-				if err := c.db.
-					Where("player_id = ?", player.ID).
-					Where("project = ?", project).
-					Where("best > ?", model.DNF).
-					Where("contest_id = ?", contestID).
-					Order("best").
-					Order("r1 DESC").
-					Order("r2").
-					Order("r3").
-					First(&b).Error; err == nil {
-					single[project] = append(single[project], b)
-				}
-				continue
-			}
-			if err := c.db.
-				Where("player_id = ?", player.ID).
-				Where("project = ?", project).
-				Where("best > ?", model.DNF).
-				Where("contest_id = ?", contestID).
-				Order("best").
-				First(&b).Error; err == nil {
-				single[project] = append(single[project], b)
-			}
-			if err := c.db.
-				Where("player_id = ?", player.ID).
-				Where("project = ?", project).
-				Where("avg > ?", model.DNF).
-				Where("contest_id = ?", contestID).
-				Order("avg").
-				First(&a).Error; err == nil {
-				avg[project] = append(avg[project], a)
-			}
-		}
-	}
-
-	for _, project := range model.AllProjectRoute() {
-		model.SortByBest(single[project])
-		model.SortByAvg(avg[project])
-	}
+func (c *Client) getContestAllBestScores(contestID uint) (bestSingle, bestAvg map[model.Project][]model.Score) {
+	playerIDs, players := c.getContestPlayers(contestID, false)
+	var allScore []model.Score
+	c.db.Where("contest_id = ?").Where("player_id in ?", playerIDs).Find(&allScore)
+	bestSingle, bestAvg = c.sortByScores(allScore, players)
 	return
 }

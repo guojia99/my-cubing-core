@@ -2,7 +2,6 @@ package core
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/guojia99/my-cubing-core/model"
@@ -45,56 +44,13 @@ func (c *Client) getRecords(page, size int) (int64, []model.Record, error) {
 
 // getBestScore 获取所有玩家的最佳成绩
 func (c *Client) getBestScore() (bestSingle, bestAvg map[model.Project][]model.Score) {
-	bestSingle, bestAvg = make(map[model.Project][]model.Score), make(map[model.Project][]model.Score)
-
 	var players []model.Player
 	c.db.Find(&players)
-
-	for _, project := range model.AllProjectRoute() {
-		bestSingle[project] = make([]model.Score, 0)
-		bestAvg[project] = make([]model.Score, 0)
-	}
 
 	var allScore []model.Score
 	c.db.Find(&allScore)
 
-	// key 是 project + playerID
-	var singleCache = make(map[string]model.Score)
-	var avgCache = make(map[string]model.Score)
-
-	// todo 分片
-	for _, score := range allScore {
-		key := fmt.Sprintf("%d_%s", score.PlayerID, score.Project)
-
-		if _, ok := singleCache[key]; !ok || score.IsBestScore(singleCache[key]) {
-			singleCache[key] = score
-		}
-
-		switch score.Project.RouteType() {
-		case model.RouteType1rounds, model.RouteTypeRepeatedly:
-			continue
-		}
-
-		if _, ok := avgCache[key]; !ok || score.IsBestAvgScore(avgCache[key]) {
-			avgCache[key] = score
-		}
-	}
-
-	for _, project := range model.AllProjectRoute() {
-		for _, player := range players {
-			key := fmt.Sprintf("%d_%s", player.ID, project)
-
-			if single, ok := singleCache[key]; ok && !single.DBest() {
-				bestSingle[project] = append(bestSingle[project], single)
-			}
-			if avg, ok := avgCache[key]; ok && !avg.DAvg() {
-				bestAvg[project] = append(bestAvg[project], avg)
-			}
-		}
-
-		model.SortByBest(bestSingle[project])
-		model.SortByAvg(bestAvg[project])
-	}
+	bestSingle, bestAvg = c.sortByScores(allScore, players)
 	return
 }
 
@@ -105,51 +61,24 @@ func (c *Client) getBestScoreByProject(project model.Project) (bestSingle, bestA
 
 // getAllProjectBestScores 获取所有项目各自的最佳成绩(最新的成绩为准)
 func (c *Client) getAllProjectBestScores() (bestSingle, bestAvg map[model.Project]model.Score) {
-	bestSingle, bestAvg = make(map[model.Project]model.Score), make(map[model.Project]model.Score)
+	var players []model.Player
+	c.db.Find(&players)
 
-	for _, project := range model.AllProjectRoute() {
-		var best, avg model.Score
-		if project.RouteType() == model.RouteTypeRepeatedly {
-			if err := c.db.
-				Where("project = ?", project).
-				Where("best > ?", model.DNF).
-				Order("best DESC").
-				Order("r1 DESC").
-				Order("r2").
-				Order("r3").
-				First(&best).Error; err == nil {
-				bestSingle[project] = best
-			}
-			continue
-		}
-		if err := c.db.
-			Where("best > ?", model.DNF).
-			Where("project = ?", project).
-			Order("best").
-			First(&best).Error; err == nil {
-			bestSingle[project] = best
-		}
-		if err := c.db.
-			Where("avg > ?", model.DNF).
-			Where("project = ?", project).
-			Order("avg").
-			First(&avg).Error; err == nil {
-			bestAvg[project] = avg
-		}
-	}
+	var allScore []model.Score
+	c.db.Find(&allScore)
+
+	bestSingle, bestAvg = c.getBestByScores(allScore, players)
 	return
 }
 
 // getSor 获取所有玩家的Sor排名
 func (c *Client) getSor() (single, avg map[model.SorStatisticsKey][]SorScore) {
-
 	var players []model.Player
 	if err := c.db.Find(&players).Error; err != nil {
 		return
 	}
 	bestSingle, bestAvg := c.getBestScore()
-	single, avg = parserSorSort(players, bestSingle, bestAvg)
-
+	single, avg = c.parserSorSort(players, bestSingle, bestAvg)
 	return
 }
 

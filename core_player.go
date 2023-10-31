@@ -142,6 +142,8 @@ func (c *Client) getPlayers(page, size int) (int64, []model.Player, error) {
 func (c *Client) getPlayerBestScore(playerId uint) (bestSingle, bestAvg map[model.Project]RankScore) {
 	bestSingle, bestAvg = make(map[model.Project]RankScore), make(map[model.Project]RankScore)
 	allBest, allAvg := c.GetBestScore()
+
+	// todo 双层map
 	for _, val := range allBest {
 		for i := 0; i < len(val); i++ {
 			if val[i].PlayerID == playerId {

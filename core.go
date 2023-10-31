@@ -20,10 +20,10 @@ func NewCore(db *gorm.DB, debug bool, cacheTime time.Duration) Core {
 		cacheTime = time.Minute * 15
 	}
 	return &Client{
-		debug:     debug,
-		db:        db,
-		cache:     cache.New(cacheTime, cacheTime),
-		cacheTime: cacheTime,
+		debug:            debug,
+		db:               db,
+		statisticalCache: cache.New(cacheTime, cacheTime),
+		cacheTime:        cacheTime,
 	}
 }
 

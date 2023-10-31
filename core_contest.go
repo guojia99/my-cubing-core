@@ -155,7 +155,7 @@ func (c *Client) getContestSor(contestID uint) (single, avg map[model.SorStatist
 	c.db.Where("id in ?", playerIDs).Find(&players)
 
 	bestSingleCache, bestAvgCache := c.getContestAllBestScores(contestID)
-	single, avg = parserSorSort(players, bestSingleCache, bestAvgCache)
+	single, avg = c.parserSorSort(players, bestSingleCache, bestAvgCache)
 	return
 }
 
