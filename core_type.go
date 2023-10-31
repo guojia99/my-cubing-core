@@ -81,6 +81,18 @@ type Podiums struct {
 	PodiumsResults []PodiumsResult `json:"PodiumsResults,omitempty"`
 }
 
+func (p *Podiums) Add(rank int) *Podiums {
+	switch rank {
+	case 1:
+		p.Gold += 1
+	case 2:
+		p.Silver += 1
+	case 3:
+		p.Bronze += 1
+	}
+	return p
+}
+
 type PodiumsResult struct {
 	Contest model.Contest `json:"Contest,omitempty"`
 	Score   model.Score   `json:"Score,omitempty"`

@@ -243,37 +243,12 @@ func (c *Client) getContestPodiums(contestID uint) (out []Podiums) {
 	var players []model.Player
 	c.db.Where("id in ?", playerIDs).Find(&players)
 
-	var cache = make(map[uint]*Podiums)
-	for _, tt := range c.getContestTop(contestID, 3) {
-		for _, val := range tt {
-			if _, ok := cache[val.PlayerID]; !ok {
-				cache[val.PlayerID] = &Podiums{}
-			}
+	mp := c.getLastScoresMapByContest()
+	var newMp = make(map[uint]map[model.Project][]model.Score)
+	newMp[contestID] = mp[contestID]
 
-			switch val.Rank {
-			case 1:
-				cache[val.PlayerID].Gold += 1
-			case 2:
-				cache[val.PlayerID].Silver += 1
-			case 3:
-				cache[val.PlayerID].Bronze += 1
-			}
-		}
-	}
-
-	for _, player := range players {
-		podiums := Podiums{
-			Player: player,
-		}
-		if val, ok := cache[player.ID]; ok {
-			podiums.Gold = val.Gold
-			podiums.Silver = val.Silver
-			podiums.Bronze = val.Bronze
-		}
-		out = append(out, podiums)
-	}
-	SortPodiums(out)
-	return
+	pds, _ := c.getPodiumsSort(players, newMp)
+	return pds
 }
 
 // getContestRecord 获取比赛的记录

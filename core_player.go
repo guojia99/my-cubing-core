@@ -170,6 +170,7 @@ func (c *Client) getPlayerBestScore(playerId uint) (bestSingle, bestAvg map[mode
 }
 
 // 获取玩家领奖台
+// todo 整改
 func (c *Client) getPlayerPodiums(playerID uint) Podiums {
 	var player model.Player
 	if err := c.db.Where("id = ?", playerID).First(&player).Error; err != nil {

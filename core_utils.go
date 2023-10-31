@@ -315,3 +315,34 @@ func (c *Client) getContestAllBestScores(contestID uint) (bestSingle, bestAvg ma
 	bestSingle, bestAvg = c.sortByScores(allScore, players)
 	return
 }
+
+// getLastScoresMapByContest 获取每个比赛每个项目最后一轮的成绩
+func (c *Client) getLastScoresMapByContest() (out map[uint]map[model.Project][]model.Score) {
+	var roundIds []uint
+	c.db.Model(&model.Round{}).Select("id").Where("final = ?", true).Find(&roundIds)
+
+	var scores []model.Score
+	c.db.Where("route_id in ?", roundIds).Find(&scores)
+
+	var contests []model.Contest
+	c.db.Find(&contests)
+
+	out = make(map[uint]map[model.Project][]model.Score)
+	for _, contest := range contests {
+		out[contest.ID] = make(map[model.Project][]model.Score)
+	}
+	for _, score := range scores {
+		if out[score.ContestID][score.Project] == nil {
+			out[score.ContestID][score.Project] = make([]model.Score, 0)
+		}
+		out[score.ContestID][score.Project] = append(out[score.ContestID][score.Project], score)
+	}
+
+	for contestID, _ := range out {
+		for pj, _ := range out[contestID] {
+			model.SortScores(out[contestID][pj])
+		}
+	}
+
+	return out
+}

@@ -1,11 +1,7 @@
 package core
 
 import (
-	"context"
-	"time"
-
 	"github.com/guojia99/my-cubing-core/model"
-	"github.com/guojia99/my-cubing-core/utils"
 )
 
 func (c *Client) getRecords(page, size int) (int64, []model.Record, error) {
@@ -82,40 +78,50 @@ func (c *Client) getSor() (single, avg map[model.SorStatisticsKey][]SorScore) {
 	return
 }
 
-func (c *Client) getPodiums() []Podiums {
-	var players []model.Player
-	_ = c.db.Find(&players)
-	var out []Podiums
-	for _, player := range players {
-		pd := c.getPlayerPodiums(player.ID)
-		pd.PodiumsResults = nil
-		out = append(out, pd)
+func (c *Client) getPodiumsSort(players []model.Player, scoreMaps map[uint]map[model.Project][]model.Score) ([]Podiums, map[uint]*Podiums) {
+	var pds []Podiums
+
+	// map key is player id
+	var pdsMap = make(map[uint]*Podiums)
+	for _, p := range players {
+		pdsMap[p.ID] = &Podiums{Player: p}
 	}
-	SortPodiums(out)
-	return out
+
+	// 这个map是  map[uint]map[model.Project][]model.Score
+	// 第一层循环是
+	for _, scoreMap := range scoreMaps {
+		for _, scores := range scoreMap {
+			if len(scores) < 3 {
+				continue
+			}
+
+			maxRank := 3
+			if len(scores) <= 5 {
+				maxRank = 1
+			}
+
+			for _, score := range scores {
+				if score.Rank > maxRank {
+					break
+				}
+				podiums := pdsMap[score.PlayerID]
+				podiums.Add(score.Rank)
+			}
+		}
+	}
+
+	for _, p := range pdsMap {
+		pds = append(pds, *p)
+	}
+	SortPodiums(pds)
+
+	return pds, pdsMap
 }
 
-func (c *Client) getPodiumsByGo() []Podiums {
+func (c *Client) getPodiums() ([]Podiums, map[uint]*Podiums) {
 	var players []model.Player
 	_ = c.db.Find(&players)
-	var out = make([]Podiums, len(players))
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
-	defer cancel()
-
-	var fns []utils.MultiGoFn
-	fn := func(ctx context.Context, idx int) {
-		pd := c.getPlayerPodiums(players[idx].ID)
-		pd.PodiumsResults = nil
-		out[idx] = pd
-	}
-	for i := 0; i < len(players); i++ {
-		fns = append(fns, fn)
-	}
-	utils.MultiGo(ctx, fns)
-
-	SortPodiums(out)
-	return out
+	return c.getPodiumsSort(players, c.getLastScoresMapByContest())
 }
 
 func (c *Client) getRelativeSor() (allPlayerSor map[model.SorStatisticsKey][]RelativeSor) {

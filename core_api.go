@@ -83,7 +83,8 @@ func (c *Client) GetPlayerBestScore(playerId uint) (bestSingle, bestAvg map[mode
 }
 
 func (c *Client) GetPlayerPodiums(playerId uint) Podiums {
-	return c.getPlayerPodiums(playerId)
+	_, pds := c.getPodiums()
+	return *pds[playerId]
 }
 
 func (c *Client) GetPlayerRecord(playerId uint) []RecordMessage {
@@ -253,7 +254,7 @@ func (c *Client) GetPodiums() []Podiums {
 		return val.([]Podiums)
 	}
 
-	out := c.getPodiums()
+	out, _ := c.getPodiums()
 	_ = c.statisticalCache.Add(key, out, c.cacheTime)
 	return out
 }
