@@ -7,8 +7,20 @@
 package model
 
 type Project string
-
+type ProjectClass string
 type RouteType string
+
+const (
+	ProjectClassWCA        = "WCA项目"
+	ProjectClassXCube      = "趣味项目"
+	ProjectClassXCubeBF    = "趣味盲拧"
+	ProjectClassXCubeOH    = "趣味单手"
+	ProjectClassXCubeFm    = "趣味最少步"
+	ProjectClassXCubeRelay = "趣味连拧"
+	ProjectClassNotCube    = "趣味非魔方"
+	ProjectClassDigit      = "记字"
+	ProjectClassSuperHigh  = "超高阶"
+)
 
 const (
 	RouteType1rounds      RouteType = "1_r"      // 单轮项目
@@ -47,6 +59,7 @@ func (p Project) String() string       { return string(p) }
 func (p Project) Cn() string           { return projectItemsMap[p].Cn }
 func (p Project) RouteType() RouteType { return projectItemsMap[p].RouteType }
 func (p Project) IsWca() bool          { return projectItemsMap[p].IsWca }
+func (p Project) Class() []string      { return projectItemsMap[p].Class }
 
 func AllProjectItem() []projectItem { return projectsItems }
 
