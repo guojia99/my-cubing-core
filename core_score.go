@@ -127,25 +127,34 @@ func (c *Client) endContestScore(contestID uint) (err error) {
 	var records []model.Record
 	for key, score := range thisContestBestSingle {
 		if _, ok := oldContestBest[key]; ok && score.IsBestScore(oldContestBest[key]) {
-			records = append(records, model.Record{
-				RType:      model.RecordBySingle,
-				ScoreId:    score.ID,
-				PlayerID:   score.PlayerID,
-				PlayerName: score.PlayerName,
-				ContestID:  score.ContestID,
-			})
+			records = append(
+				records, model.Record{
+					RType:      model.RecordBySingle,
+					ScoreId:    score.ID,
+					PlayerID:   score.PlayerID,
+					PlayerName: score.PlayerName,
+					ContestID:  score.ContestID,
+				},
+			)
 		}
 	}
 
 	for key, score := range thisContestBestAvg {
+		switch score.Project.RouteType() {
+		case model.RouteTypeRepeatedly, model.RouteType1rounds:
+			continue
+		}
+
 		if _, ok := oldContestAvg[key]; ok && score.IsBestAvgScore(oldContestAvg[key]) {
-			records = append(records, model.Record{
-				RType:      model.RecordByAvg,
-				ScoreId:    score.ID,
-				PlayerID:   score.PlayerID,
-				PlayerName: score.PlayerName,
-				ContestID:  score.ContestID,
-			})
+			records = append(
+				records, model.Record{
+					RType:      model.RecordByAvg,
+					ScoreId:    score.ID,
+					PlayerID:   score.PlayerID,
+					PlayerName: score.PlayerName,
+					ContestID:  score.ContestID,
+				},
+			)
 		}
 	}
 	_ = c.db.Save(&records)
@@ -196,9 +205,11 @@ func (c *Client) getScoreByPlayerContest(playerId uint, contestId uint) ([]model
 		return nil, err
 	}
 
-	sort.Slice(score, func(i, j int) bool {
-		return score[i].CreatedAt.Sub(score[j].CreatedAt) > 0
-	})
+	sort.Slice(
+		score, func(i, j int) bool {
+			return score[i].CreatedAt.Sub(score[j].CreatedAt) > 0
+		},
+	)
 
 	for i, _ := range score {
 		var round model.Round
