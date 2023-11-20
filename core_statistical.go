@@ -1,6 +1,8 @@
 package core
 
 import (
+	"time"
+
 	"github.com/guojia99/my-cubing-core/model"
 )
 
@@ -50,6 +52,20 @@ func (c *Client) getBestScore() (bestSingle, bestAvg map[model.Project][]model.S
 	return
 }
 
+func (c *Client) getBestScoreWithTime(s, e time.Time) (bestSingle, bestAvg map[model.Project][]model.Score) {
+	var allScore []model.Score
+	c.db.Where("created_at > ?", s).Where("created_at < ?", e).Find(&allScore)
+
+	var playerIds []uint
+	c.db.Model(&model.Score{}).Distinct("player_id").Where("created_at > ?", s).Where("created_at < ?", e).Pluck("player_id", &playerIds)
+
+	var players []model.Player
+	c.db.Where("id in ?", playerIds).Find(&players)
+
+	bestSingle, bestAvg = c.sortByScores(allScore, players)
+	return
+}
+
 func (c *Client) getBestScoreByProject(project model.Project) (bestSingle, bestAvg []model.Score) {
 	b, a := c.getBestScore()
 	return b[project], a[project]
@@ -62,6 +78,20 @@ func (c *Client) getAllProjectBestScores() (bestSingle, bestAvg map[model.Projec
 
 	var allScore []model.Score
 	c.db.Find(&allScore)
+
+	bestSingle, bestAvg = c.getBestByScores(allScore, players)
+	return
+}
+
+func (c *Client) getAllProjectBestScoresWithTime(s, e time.Time) (bestSingle, bestAvg map[model.Project]model.Score) {
+	var allScore []model.Score
+	c.db.Where("created_at > ?", s).Where("created_at < ?", e).Find(&allScore)
+
+	var playerIds []uint
+	c.db.Model(&model.Score{}).Distinct("player_id").Where("created_at > ?", s).Where("created_at < ?", e).Pluck("player_id", &playerIds)
+
+	var players []model.Player
+	c.db.Where("id in ?", playerIds).Find(&players)
 
 	bestSingle, bestAvg = c.getBestByScores(allScore, players)
 	return

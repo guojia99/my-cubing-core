@@ -82,12 +82,14 @@ type ContestCore interface {
 }
 
 type StatisticalCore interface {
-	GetRecords(page, size int) (int64, []model.Record, error)                        // 获取所有记录（分页）
-	GetBestScore() (bestSingle, bestAvg map[model.Project][]model.Score)             // 获取所有项目每个人的最佳成绩汇总
-	GetBestScoreByProject(project model.Project) (bestSingle, bestAvg []model.Score) // 获取单项目每个人最佳成绩汇总成绩
-	GetAllProjectBestScores() (bestSingle, bestAvg map[model.Project]model.Score)    // 获取所有项目最佳成绩
-	GetPodiums() []Podiums                                                           // 获取领奖台汇总
-	GetSor() (single, avg map[model.SorStatisticsKey][]SorScore)                     // 获取sor排名汇总
-	GetAvgRelativeSor() map[model.SorStatisticsKey]RelativeSor                       // 平均相对排位分
-	GetRelativeSor() (allPlayerSor map[model.SorStatisticsKey][]RelativeSor)         // 相对排位分, 返回所有人的平均排位分,计算方式是用当前最佳成绩为标准, 计算与其差距
+	GetRecords(page, size int) (int64, []model.Record, error)                                                        // 获取所有记录（分页）
+	GetBestScore() (bestSingle, bestAvg map[model.Project][]model.Score)                                             // 获取所有项目每个人的最佳成绩汇总
+	GetBestScoreByTimes(startTime, endTime time.Time) (bestSingle, bestAvg map[model.Project][]model.Score)          // [Time]获取所有项目每个人的最佳成绩汇总
+	GetBestScoreByProject(project model.Project) (bestSingle, bestAvg []model.Score)                                 // 获取单项目每个人最佳成绩汇总成绩
+	GetAllProjectBestScores() (bestSingle, bestAvg map[model.Project]model.Score)                                    // 获取所有项目最佳成绩
+	GetAllProjectBestScoresByTimes(startTime, endTime time.Time) (bestSingle, bestAvg map[model.Project]model.Score) // [Time]获取所有项目最佳成绩
+	GetPodiums() []Podiums                                                                                           // 获取领奖台汇总
+	GetSor() (single, avg map[model.SorStatisticsKey][]SorScore)                                                     // 获取sor排名汇总
+	GetAvgRelativeSor() map[model.SorStatisticsKey]RelativeSor                                                       // 平均相对排位分
+	GetRelativeSor() (allPlayerSor map[model.SorStatisticsKey][]RelativeSor)                                         // 相对排位分, 返回所有人的平均排位分,计算方式是用当前最佳成绩为标准, 计算与其差距
 }

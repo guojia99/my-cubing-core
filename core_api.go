@@ -214,6 +214,16 @@ func (c *Client) GetBestScore() (bestSingle, bestAvg map[model.Project][]model.S
 	_ = c.statisticalCache.Add(key, [2]any{bestSingle, bestAvg}, c.cacheTime)
 	return
 }
+func (c *Client) GetBestScoreByTimes(startTime, endTime time.Time) (bestSingle, bestAvg map[model.Project][]model.Score) {
+	key := fmt.Sprintf("GetBestScoreByTimes_%v_%v", startTime, endTime)
+	if val, ok := c.statisticalCache.Get(key); ok && !c.debug {
+		result := val.([2]any)
+		return result[0].(map[model.Project][]model.Score), result[1].(map[model.Project][]model.Score)
+	}
+	bestSingle, bestAvg = c.getBestScoreWithTime(startTime, endTime)
+	_ = c.statisticalCache.Add(key, [2]any{bestSingle, bestAvg}, c.cacheTime)
+	return
+}
 
 func (c *Client) GetBestScoreByProject(project model.Project) (bestSingle, bestAvg []model.Score) {
 	key := fmt.Sprintf("GetBestScoreByProject_%v", project)
@@ -233,6 +243,16 @@ func (c *Client) GetAllProjectBestScores() (bestSingle, bestAvg map[model.Projec
 		return result[0].(map[model.Project]model.Score), result[1].(map[model.Project]model.Score)
 	}
 	bestSingle, bestAvg = c.getAllProjectBestScores()
+	_ = c.statisticalCache.Add(key, [2]any{bestSingle, bestAvg}, c.cacheTime)
+	return
+}
+func (c *Client) GetAllProjectBestScoresByTimes(startTime, endTime time.Time) (bestSingle, bestAvg map[model.Project]model.Score) {
+	key := fmt.Sprintf("GetAllProjectBestScoresByTimes_%v_%v", startTime, endTime)
+	if val, ok := c.statisticalCache.Get(key); ok && !c.debug {
+		result := val.([2]any)
+		return result[0].(map[model.Project]model.Score), result[1].(map[model.Project]model.Score)
+	}
+	bestSingle, bestAvg = c.getAllProjectBestScoresWithTime(startTime, endTime)
 	_ = c.statisticalCache.Add(key, [2]any{bestSingle, bestAvg}, c.cacheTime)
 	return
 }
