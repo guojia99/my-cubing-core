@@ -15,27 +15,18 @@ var sheetKeys = []string{
 	"H", "I", "J", "K", "L", "M", "N",
 }
 
-func ExportContestScoreXlsx(core coreModel.Core, contestID uint, fileName string) error {
-	f := excelize.NewFile()
-	defer f.Close()
-	contest, err := core.GetContest(contestID)
-	if err != nil {
-		return err
-	}
-	sheet := contest.Name
-	scores := core.GetContestScore(contestID)
-	index, err := f.NewSheet(sheet)
-	if err != nil {
-		return err
-	}
-	// style
-	borders := []excelize.Border{
-		{Type: "left", Color: "1F1F1F", Style: 1},
-		{Type: "right", Color: "1F1F1F", Style: 1},
-		{Type: "top", Color: "1F1F1F", Style: 1},
-		{Type: "bottom", Color: "1F1F1F", Style: 1},
-	}
+var borders = []excelize.Border{
+	{Type: "left", Color: "1F1F1F", Style: 1},
+	{Type: "right", Color: "1F1F1F", Style: 1},
+	{Type: "top", Color: "1F1F1F", Style: 1},
+	{Type: "bottom", Color: "1F1F1F", Style: 1},
+}
 
+func setContestScoreToExcel(contestID uint, f *excelize.File, core coreModel.Core, sheet string) error {
+
+	scores := core.GetContestScore(contestID)
+
+	// style
 	redStyle, _ := f.NewStyle(
 		&excelize.Style{
 			Fill:      excelize.Fill{Type: "gradient", Color: []string{"F1B8F1", "F1B8F1"}, Shading: 1},
@@ -56,25 +47,11 @@ func ExportContestScoreXlsx(core coreModel.Core, contestID uint, fileName string
 			Alignment: &excelize.Alignment{Horizontal: "center", Vertical: "center"},
 		},
 	)
-	//hardBorders := []excelize.Border{
-	//	{Type: "left", Color: "1F1F1F", Style: 2},
-	//	{Type: "right", Color: "1F1F1F", Style: 2},
-	//	{Type: "top", Color: "1F1F1F", Style: 2},
-	//	{Type: "bottom", Color: "1F1F1F", Style: 2},
-	//}
-	//hardCenterStyle, _ := f.NewStyle(
-	//	&excelize.Style{
-	//		Border:    hardBorders,
-	//		Alignment: &excelize.Alignment{Horizontal: "center", Vertical: "center"},
-	//	},
-	//)
-
 	_ = f.SetColWidth(sheet, "A", "H", 6)
 	_ = f.SetColWidth(sheet, "B", "B", 15)
 	_ = f.SetColWidth(sheet, "E", "H", 15)
 	_ = f.SetColWidth(sheet, "H", "H", 50)
 	_ = f.SetColStyle(sheet, "A:H", centerStyle)
-	_ = f.SetCellStyle(sheet, "A3", "A3", redStyle)
 
 	// 标题头
 	line := 1
@@ -141,8 +118,27 @@ func ExportContestScoreXlsx(core coreModel.Core, contestID uint, fileName string
 
 		_ = f.MergeCell(sheet, fmt.Sprintf("B%d", curLine), fmt.Sprintf("B%d", line-1))
 	}
+	return nil
+}
 
-	f.SetActiveSheet(index)
+func ExportContestScoreXlsx(core coreModel.Core, contestID uint, fileName string) error {
+	f := excelize.NewFile()
+	defer f.Close()
+
+	// 查比赛
+	contest, err := core.GetContest(contestID)
+	if err != nil {
+		return err
+	}
+
+	// 比赛成绩页面
+	contestSheet, _ := f.NewSheet(contest.Name)
+	f.SetActiveSheet(contestSheet)
+	if err = setContestScoreToExcel(contestID, f, core, contest.Name); err != nil {
+		return err
+	}
+
+	_ = f.DeleteSheet("Sheet1")
 	err = f.SaveAs(fileName)
 	return err
 }
