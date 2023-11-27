@@ -48,9 +48,10 @@ type PlayerUser struct {
 	PlayerID uint   `gorm:"unique;not null;column:player_id"` // 选手ID
 	Password string `json:"-" gorm:""`                        // 密码 md5加密校验
 
-	QQ     string `json:"-" gorm:"column:qq"`     // qq号
-	WeChat string `json:"-" gorm:"column:wechat"` // 微信号
-	Phone  string `json:"-" gorm:"column:phone"`  // 手机号
+	QQ         string `json:"-" gorm:"column:qq"`     // qq号
+	QQBotUniID string `json:"-" gorm:"column:qq"`     // qq 机器人ID
+	WeChat     string `json:"-" gorm:"column:wechat"` // 微信号
+	Phone      string `json:"-" gorm:"column:phone"`  // 手机号
 }
 
 func (p PlayerUser) Valid() bool {
