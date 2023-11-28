@@ -53,15 +53,13 @@ func (c *Client) addScore(playerID uint, contestID uint, project model.Project, 
 	}
 	score.SetResult(result, penalty)
 	score.Penalty, _ = jsoniter.MarshalToString(penalty)
-	score.IsBestSingle, score.IsBestAvg = false, false
-
-	save := c.db.Save(&score)
-	if err = save.Error; err != nil {
+	if err = c.db.Save(&score).Error; err != nil {
 		return err
 	}
-	score.ID = uint(save.RowsAffected)
 
-	// 5. 找到该玩家最佳成绩
+	// 5. 找到该玩家最佳成绩, 并进行最佳成绩刷新
+	c.db.Model(&model.Score{}).Where("player_id = ?", player.ID).Where("contest_id = ?", contestID).Where("route_id = ?", round.ID).First(&score)
+	score.IsBestSingle, score.IsBestAvg = false, false
 	bestS, hasBest, BestA, hasAvg := c.getPlayerBestScoreByProject(playerID, project)
 
 	// 最佳成绩对比
