@@ -42,27 +42,31 @@ func (c *Client) addPreScore(request AddPreScoreRequest) error {
 		Where("finish = ?", false).
 		Order("created_at DESC").
 		First(&preScore).Error
-	if err == nil && preScore.ID != 0 {
-		preScore.Score = model.Score{
-			PlayerID:   request.PlayerID,
-			PlayerName: player.Name,
-			ContestID:  request.ContestID,
-			RouteID:    request.RoundId,
-			Project:    request.Project,
-			Result1:    request.Result[0],
-			Result2:    request.Result[1],
-			Result3:    request.Result[2],
-			Result4:    request.Result[3],
-			Result5:    request.Result[4],
-		}
-		preScore.ContestName = contest.Name
-		preScore.RoundName = round.Name
-		preScore.Recorder = request.Recorder
-		preScore.Source = request.Source
+
+	preScore.Score = model.Score{
+		PlayerID:   request.PlayerID,
+		PlayerName: player.Name,
+		ContestID:  request.ContestID,
+		RouteID:    request.RoundId,
+		Project:    request.Project,
+		Result1:    request.Result[0],
+		Result2:    request.Result[1],
+		Result3:    request.Result[2],
+		Result4:    request.Result[3],
+		Result5:    request.Result[4],
 	}
+	preScore.ContestName = contest.Name
+	preScore.RoundName = round.Name
+	preScore.Recorder = request.Recorder
+	preScore.Source = request.Source
 
 	preScore.Penalty, _ = jsoniter.MarshalToString(request.Penalty)
-	return c.db.Save(&preScore).Error
+
+	if err == nil {
+		return c.db.Save(&preScore).Error
+	}
+
+	return c.db.Create(&preScore).Error
 }
 
 func (c *Client) processPreScore(request ProcessPreScoreRequest) error {
