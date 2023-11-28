@@ -39,7 +39,6 @@ func (c *Client) addPreScore(request AddPreScoreRequest) error {
 		Where("contest_id = ?", request.ContestID).
 		Where("route_id = ?", request.RoundId).
 		Where("project = ?", request.Project).
-		Where("finish = ?", false).
 		Order("created_at DESC").
 		First(&preScore).Error
 
@@ -62,7 +61,7 @@ func (c *Client) addPreScore(request AddPreScoreRequest) error {
 
 	preScore.Penalty, _ = jsoniter.MarshalToString(request.Penalty)
 
-	if err == nil {
+	if err == nil || !preScore.Finish {
 		return c.db.Save(&preScore).Error
 	}
 
