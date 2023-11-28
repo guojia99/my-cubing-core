@@ -61,7 +61,7 @@ func (c *Client) addPreScore(request AddPreScoreRequest) error {
 
 	preScore.Penalty, _ = jsoniter.MarshalToString(request.Penalty)
 
-	if err == nil || !preScore.Finish {
+	if err == nil && !preScore.Finish {
 		return c.db.Save(&preScore).Error
 	}
 
