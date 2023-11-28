@@ -39,9 +39,10 @@ func (c *Client) addPreScore(request AddPreScoreRequest) error {
 		Where("contest_id = ?", request.ContestID).
 		Where("route_id = ?", request.RoundId).
 		Where("project = ?", request.Project).
+		Where("finish = ?", false).
 		Order("created_at DESC").
 		First(&preScore).Error
-	if err == nil && preScore.ID != 0 && !preScore.Finish {
+	if err == nil && preScore.ID != 0 {
 		preScore.Score = model.Score{
 			PlayerID:   request.PlayerID,
 			PlayerName: player.Name,
