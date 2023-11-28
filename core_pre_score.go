@@ -42,11 +42,7 @@ func (c *Client) addPreScore(request AddPreScoreRequest) error {
 		Order("created_at DESC").
 		First(&preScore).Error
 	if err == nil && preScore.ID != 0 && !preScore.Finish {
-		return errors.New("该预录入成绩已存在")
-	}
-
-	preScore = model.PreScore{
-		Score: model.Score{
+		preScore.Score = model.Score{
 			PlayerID:   request.PlayerID,
 			PlayerName: player.Name,
 			ContestID:  request.ContestID,
@@ -57,15 +53,15 @@ func (c *Client) addPreScore(request AddPreScoreRequest) error {
 			Result3:    request.Result[2],
 			Result4:    request.Result[3],
 			Result5:    request.Result[4],
-		},
-		ContestName: contest.Name,
-		RoundName:   round.Name,
-		Recorder:    request.Recorder,
-		Source:      request.Source,
+		}
+		preScore.ContestName = contest.Name
+		preScore.RoundName = round.Name
+		preScore.Recorder = request.Recorder
+		preScore.Source = request.Source
 	}
 
 	preScore.Penalty, _ = jsoniter.MarshalToString(request.Penalty)
-	return c.db.Create(&preScore).Error
+	return c.db.Save(&preScore).Error
 }
 
 func (c *Client) processPreScore(request ProcessPreScoreRequest) error {
