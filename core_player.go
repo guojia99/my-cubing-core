@@ -138,10 +138,30 @@ func (c *Client) getPlayers(page, size int) (int64, []model.Player, error) {
 	return count, out, nil
 }
 
+func (c *Client) getPlayerBestScoreByProject(playerId uint, project model.Project) (best RankScore, hasBest bool, avg RankScore, hasAvg bool) {
+	b, a := c.getPlayerBestScore(playerId)
+	best, hasBest = b[project]
+	avg, hasAvg = a[project]
+
+	if hasBest {
+		if best.Score.ID == 0 {
+			hasBest = false
+		}
+	}
+
+	if hasAvg {
+		if best.Score.ID == 0 {
+			hasAvg = false
+		}
+	}
+
+	return
+}
+
 // 获取玩家全项目最佳成绩
 func (c *Client) getPlayerBestScore(playerId uint) (bestSingle, bestAvg map[model.Project]RankScore) {
 	bestSingle, bestAvg = make(map[model.Project]RankScore), make(map[model.Project]RankScore)
-	allBest, allAvg := c.GetBestScore()
+	allBest, allAvg := c.getBestScore()
 
 	// todo 双层map
 	for _, val := range allBest {
@@ -211,10 +231,12 @@ func (c *Client) getPlayerPodiums(playerID uint) Podiums {
 					case 3:
 						out.Bronze += 1
 					}
-					out.PodiumsResults = append(out.PodiumsResults, PodiumsResult{
-						Contest: contest,
-						Score:   score[idx],
-					})
+					out.PodiumsResults = append(
+						out.PodiumsResults, PodiumsResult{
+							Contest: contest,
+							Score:   score[idx],
+						},
+					)
 				}
 			}
 		}
@@ -242,12 +264,14 @@ func (c *Client) getPlayerRecord(playerID uint) []RecordMessage {
 		_ = c.db.First(&contest, "id = ?", record.ContestID).Error
 		_ = c.db.First(&score, "id = ?", record.ScoreId).Error
 
-		out = append(out, RecordMessage{
-			Record:  record,
-			Player:  player,
-			Score:   score,
-			Contest: contest,
-		})
+		out = append(
+			out, RecordMessage{
+				Record:  record,
+				Player:  player,
+				Score:   score,
+				Contest: contest,
+			},
+		)
 	}
 	return out
 }
@@ -291,11 +315,13 @@ func (c *Client) getPlayerScore(playerID uint) (bestSingle, bestAvg []model.Scor
 		c.db.Find(&rounds, "contest_id = ?", contest.ID)
 
 		sort.Slice(val, func(i, j int) bool { return val[i].ID > val[j].ID })
-		scoresByContest = append(scoresByContest, ScoresByContest{
-			Contest: contest,
-			Rounds:  rounds,
-			Scores:  val,
-		})
+		scoresByContest = append(
+			scoresByContest, ScoresByContest{
+				Contest: contest,
+				Rounds:  rounds,
+				Scores:  val,
+			},
+		)
 	}
 
 	for _, val := range avgCache {
@@ -428,11 +454,13 @@ loop:
 			}
 		}
 
-		out = append(out, NemesisDetail{
-			Player: p,
-			Single: otherBest,
-			Avg:    otherAvg,
-		})
+		out = append(
+			out, NemesisDetail{
+				Player: p,
+				Single: otherBest,
+				Avg:    otherAvg,
+			},
+		)
 	}
 	return out
 }

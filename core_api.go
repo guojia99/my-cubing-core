@@ -26,6 +26,11 @@ type Client struct {
 	cacheTime        time.Duration
 }
 
+func (c *Client) BackToFile() error {
+
+	return nil
+}
+
 // score Core
 func (c *Client) AddScore(req AddScoreRequest) error {
 	return c.addScore(req.PlayerID, req.ContestID, req.Project, req.RoundId, req.Result, req.Penalty)

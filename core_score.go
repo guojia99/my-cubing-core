@@ -34,7 +34,7 @@ func (c *Client) addScore(playerID uint, contestID uint, project model.Project, 
 		return err
 	}
 
-	// 4. 尝试找到本场比赛成绩
+	// 4. 尝试找到本场比赛成绩, 刷新后保存
 	var score model.Score
 	err = c.db.Model(&model.Score{}).
 		Where("player_id = ?", player.ID).
@@ -51,46 +51,37 @@ func (c *Client) addScore(playerID uint, contestID uint, project model.Project, 
 			Project:    project,
 		}
 	}
-
 	score.SetResult(result, penalty)
 	score.Penalty, _ = jsoniter.MarshalToString(penalty)
-	if err = c.db.Save(&score).Error; err != nil {
+	score.IsBestSingle, score.IsBestAvg = false, false
+
+	save := c.db.Save(&score)
+	if err = save.Error; err != nil {
 		return err
 	}
+	score.ID = uint(save.RowsAffected)
 
-	// 5. 最佳成绩查询, 确定是否该玩家刷新了最佳成绩
-	if score.Best == 0 {
-		return nil
-	}
-	var (
-		bestSingle model.Score
-		bestAvg    model.Score
-	)
-	err = c.db.Where("player_id = ?", player.ID).
-		Where("project = ?", project).
-		Where("best > ?", model.DNF).
-		Where("id != ?", score.ID).
-		Order("best").
-		First(&bestSingle).Error
-	if !score.DBest() && ((err != nil || bestSingle.DBest()) || (score.IsBestScore(bestSingle))) {
-		// 之前没有成绩, 且当前有成绩
-		// 之前有成绩, 当前成绩好
+	// 5. 找到该玩家最佳成绩
+	bestS, hasBest, BestA, hasAvg := c.getPlayerBestScoreByProject(playerID, project)
+
+	// 最佳成绩对比
+	// 0. 如果当前是D, 则直接不给.
+	// 1. 最佳成绩是否是当前成绩ID, 如果是, 则直接给最佳成绩的字段标签
+	// 2. 无最佳成绩, 且当前有成绩, 给最佳成绩标签
+	// 3. 有最佳成绩, 且不是当前的ID, 对比当前成绩是否最佳.
+	if !score.DBest() && ((!hasBest) ||
+		(hasBest && bestS.Score.ID == score.ID) ||
+		(hasBest && bestS.Score.ID != score.ID && score.IsBestScore(bestS.Score))) {
 		score.IsBestSingle = true
-		c.db.Save(&score)
 	}
-
-	err = c.db.
-		Where("player_id = ?", player.ID).
-		Where("project = ?", project).
-		Where("avg > ?", model.DNF).
-		Where("id != ?", score.ID).
-		Order("avg").
-		First(&bestAvg).Error
-
-	if !score.DAvg() && ((err != nil || bestAvg.DAvg()) || score.IsBestAvgScore(bestAvg)) {
+	if !score.DAvg() && ((!hasAvg) ||
+		(hasAvg && BestA.Score.ID == score.ID) ||
+		(hasAvg && BestA.Score.ID != score.ID && score.IsBestAvgScore(BestA.Score))) {
 		score.IsBestAvg = true
-		c.db.Save(&score)
 	}
+
+	c.db.Save(&score)
+
 	return nil
 }
 
