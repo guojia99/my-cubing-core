@@ -12,15 +12,33 @@ type RouteType string
 
 const (
 	ProjectClassWCA        = "WCA项目"
+	ProjectClassWCABF      = "WCA盲拧"
+	ProjectClassWCAAlien   = "WCA异型"
+	ProjectClassWCACube    = "WCA正阶"
 	ProjectClassXCube      = "趣味项目"
 	ProjectClassXCubeBF    = "趣味盲拧"
-	ProjectClassXCubeOH    = "趣味单手"
-	ProjectClassXCubeFm    = "趣味最少步"
+	ProjectClassXCubeOH    = "单手"
+	ProjectClassXCubeFm    = "最少步"
 	ProjectClassXCubeRelay = "趣味连拧"
 	ProjectClassNotCube    = "趣味非魔方"
 	ProjectClassDigit      = "记字"
 	ProjectClassSuperHigh  = "超高阶"
 )
+
+var ProjectClassList = []ProjectClass{
+	ProjectClassWCA,
+	ProjectClassWCABF,
+	ProjectClassWCAAlien,
+	ProjectClassWCACube,
+	ProjectClassXCube,
+	ProjectClassXCubeBF,
+	ProjectClassXCubeOH,
+	ProjectClassXCubeFm,
+	ProjectClassXCubeRelay,
+	ProjectClassNotCube,
+	ProjectClassDigit,
+	ProjectClassSuperHigh,
+}
 
 const (
 	RouteType1rounds      RouteType = "1_r"      // 单轮项目
