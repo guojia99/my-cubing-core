@@ -14,6 +14,7 @@ const (
 type Record struct {
 	Model
 
+	Project      Project `json:"Project,omitempty" gorm:"column:project"`   // 项目
 	RType        uint    `json:"RType,omitempty" gorm:"column:rtype"`       // 记录类型
 	ScoreId      uint    `json:"score_id,omitempty" gorm:"column:score_id"` // 成绩记录位置
 	ScoreValue   Score   `json:"ScoreValue,omitempty" gorm:"-"`

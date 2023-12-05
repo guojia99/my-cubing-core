@@ -13,6 +13,12 @@ import (
 
 func (c *Client) resetRecords() error {
 	// 获取所有成绩, 时间倒序排序
+	var player []model.Player
+	c.db.Find(&player)
+
+	var contests []model.Contest
+	c.db.Find(&contests)
+
 	var scores []model.Score
 	c.db.Find(&scores)
 
@@ -20,54 +26,82 @@ func (c *Client) resetRecords() error {
 	var bestM = make(map[model.Project]model.Score)
 	var avgM = make(map[model.Project]model.Score)
 
-	var records []model.Record
+	// 一场比赛一个项目和内容只能有一个记录
+	// 从每场比赛中获取所有各自最佳成绩
+	var scoresByContest = make(map[uint][]model.Score)
 	for _, score := range scores {
-		best, ok := bestM[score.Project]
-		if !ok { // 首个最佳不作数
-			bestM[score.Project] = score
-			continue
+		if _, ok := scoresByContest[score.ContestID]; !ok {
+			scoresByContest[score.ContestID] = make([]model.Score, 0)
 		}
-		if score.IsBestScore(best) {
-			records = append(
-				records, model.Record{
-					Model: model.Model{
-						CreatedAt: score.CreatedAt,
-					},
-					RType:      model.RecordBySingle,
-					ScoreId:    score.ID,
-					PlayerID:   score.PlayerID,
-					PlayerName: score.PlayerName,
-					ContestID:  score.ContestID,
-				},
-			)
-			bestM[score.Project] = score
+		scoresByContest[score.ContestID] = append(scoresByContest[score.ContestID], score)
+	}
+
+	// todo 考虑双R的存在
+	var scoresBestByContest = make(map[uint][2]map[model.Project]model.Score)
+	for id, score := range scoresByContest {
+		best, avg := c.getBestByScores(score, player)
+		scoresBestByContest[id] = [2]map[model.Project]model.Score{
+			best, avg,
 		}
 	}
-	for _, score := range scores {
-		switch score.Project.RouteType() {
-		case model.RouteType1rounds, model.RouteTypeRepeatedly:
+
+	var records []model.Record
+	for _, contest := range contests {
+		b, ok := scoresBestByContest[contest.ID]
+		if !ok {
 			continue
+		}
+		best, avg := b[0], b[1]
+
+		for pj, score := range best {
+			oldBest, ok := bestM[pj]
+			if !ok { // 首个最佳不作数
+				bestM[score.Project] = score
+				continue
+			}
+			if score.IsBestScore(oldBest) {
+				records = append(
+					records, model.Record{
+						Model: model.Model{
+							CreatedAt: score.CreatedAt,
+						},
+						RType:      model.RecordBySingle,
+						ScoreId:    score.ID,
+						PlayerID:   score.PlayerID,
+						PlayerName: score.PlayerName,
+						ContestID:  score.ContestID,
+					},
+				)
+				bestM[score.Project] = score
+			}
 		}
 
-		avg, ok := avgM[score.Project]
-		if !ok { // 首个最佳不作数
-			avgM[score.Project] = score
-			continue
-		}
-		if score.IsBestAvgScore(avg) {
-			records = append(
-				records, model.Record{
-					Model: model.Model{
-						CreatedAt: score.CreatedAt,
+		for pj, score := range avg {
+			switch score.Project.RouteType() {
+			case model.RouteType1rounds, model.RouteTypeRepeatedly:
+				continue
+			}
+
+			oldAvg, ok := avgM[pj]
+			if !ok { // 首个最佳不作数
+				avgM[pj] = score
+				continue
+			}
+			if score.IsBestAvgScore(oldAvg) {
+				records = append(
+					records, model.Record{
+						Model: model.Model{
+							CreatedAt: score.CreatedAt,
+						},
+						RType:      model.RecordByAvg,
+						ScoreId:    score.ID,
+						PlayerID:   score.PlayerID,
+						PlayerName: score.PlayerName,
+						ContestID:  score.ContestID,
 					},
-					RType:      model.RecordByAvg,
-					ScoreId:    score.ID,
-					PlayerID:   score.PlayerID,
-					PlayerName: score.PlayerName,
-					ContestID:  score.ContestID,
-				},
-			)
-			avgM[score.Project] = score
+				)
+				avgM[score.Project] = score
+			}
 		}
 	}
 
@@ -100,8 +134,8 @@ func (c *Client) addScore(playerID uint, contestID uint, project model.Project, 
 		return err
 	}
 
-	// 3.5 最佳记录
-	bestM, avgM := c.GetAllProjectBestScores()
+	//3.5 最佳记录
+	//bestM, avgM := c.GetAllProjectBestScores()
 
 	// 4. 尝试找到本场比赛成绩, 刷新后保存
 	var score model.Score
@@ -147,43 +181,44 @@ func (c *Client) addScore(playerID uint, contestID uint, project model.Project, 
 	c.db.Save(&score)
 
 	// 6. 查看是否需要刷新记录
-	// - 查询历史最佳成绩
-	var records []model.Record
-	if best, ok := bestM[score.Project]; ok && score.IsBestScore(best) {
-		// 添加记录, 查看记录是否存在
-		records = append(
-			records, model.Record{
-				RType:      model.RecordBySingle,
-				ScoreId:    score.ID,
-				PlayerID:   score.PlayerID,
-				PlayerName: score.PlayerName,
-				ContestID:  score.ContestID,
-			},
-		)
-	}
-
-	if avg, ok := avgM[score.Project]; ok && score.IsBestAvgScore(avg) {
-		switch score.Project.RouteType() {
-		case model.RouteType1rounds, model.RouteTypeRepeatedly: // 无平均
-		default:
-			records = append(
-				records, model.Record{
-					RType:      model.RecordByAvg,
-					ScoreId:    score.ID,
-					PlayerID:   score.PlayerID,
-					PlayerName: score.PlayerName,
-					ContestID:  score.ContestID,
-				},
-			)
-		}
-	}
-	if err = c.db.Where("player_id = ?", score.PlayerID).Where("contest_id = ?", score.ContestID).Delete(&model.Record{}).Error; err != nil {
-		return err
-	}
-
-	if len(records) > 0 {
-		err = c.db.Save(&records).Error
-	}
+	//// - 查询历史最佳成绩
+	//var records []model.Record
+	//if best, ok := bestM[score.Project]; ok && score.IsBestScore(best) {
+	//	// 添加记录, 查看记录是否存在
+	//	records = append(
+	//		records, model.Record{
+	//			RType:      model.RecordBySingle,
+	//			ScoreId:    score.ID,
+	//			PlayerID:   score.PlayerID,
+	//			PlayerName: score.PlayerName,
+	//			ContestID:  score.ContestID,
+	//		},
+	//	)
+	//}
+	//
+	//if avg, ok := avgM[score.Project]; ok && score.IsBestAvgScore(avg) {
+	//	switch score.Project.RouteType() {
+	//	case model.RouteType1rounds, model.RouteTypeRepeatedly: // 无平均
+	//	default:
+	//		records = append(
+	//			records, model.Record{
+	//				RType:      model.RecordByAvg,
+	//				ScoreId:    score.ID,
+	//				PlayerID:   score.PlayerID,
+	//				PlayerName: score.PlayerName,
+	//				ContestID:  score.ContestID,
+	//			},
+	//		)
+	//	}
+	//}
+	//if err = c.db.Where("player_id = ?", score.PlayerID).Where("contest_id = ?", score.ContestID).Delete(&model.Record{}).Error; err != nil {
+	//	return err
+	//}
+	//
+	//if len(records) > 0 {
+	//	// 删除该场比赛产生的记录
+	//	err = c.db.Save(&records).Error
+	//}
 
 	return err
 }
