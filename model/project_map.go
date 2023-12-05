@@ -139,20 +139,9 @@ const (
 	NotCube80Puzzle Project = "80puzzle"
 
 	// 记字
-	NotCubeDigitVeryEasy           Project = "digit_very_easy"     // 20个
-	NotCubeDigitEasy               Project = "digit_easy"          // 40个
-	NotCubeDigitModerate           Project = "digit_moderate"      // 80个
-	NotCubeDigitAdvanced           Project = "digit_advanced"      // 120个
-	NotCubeDigitHard               Project = "digit_hard"          // 200个
-	NotCubeDigitMaster             Project = "digit_master"        // 300个
-	NotCubeDigitOnlyNumberVeryEasy Project = "digit_num_very_easy" // 纯数字20个
-	NotCubeDigitOnlyNumberEasy     Project = "digit_num_easy"      // 纯数字40个
-	NotCubeDigitOnlyNumberModerate Project = "digit_num_moderate"  // 纯数字80个
-	NotCubeDigitOnlyNumberAdvanced Project = "digit_num_advanced"  // 纯数字120个
-	NotCubeDigitOnlyNumberHard     Project = "digit_num_hard"      // 纯数字200个
-	NotCubeDigitOnlyNumberMaster   Project = "digit_num_master"    // 纯数字300个
-
-	NotCubePuke Project = "puke" // 扑克记忆
+	NotCubeDigit           Project = "digit"     // 任意字符
+	NotCubeDigitOnlyNumber Project = "digit_num" // 纯数字20个
+	NotCubePuke            Project = "puke"      // 扑克记忆
 )
 
 var projectsItems = []projectItem{
@@ -279,18 +268,8 @@ var projectsItems = []projectItem{
 	{Project: NotCube63Puzzle, Cn: "8阶数字华容道", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassNotCube}},
 	{Project: NotCube80Puzzle, Cn: "9阶数字华容道", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassNotCube}},
 
-	{Project: NotCubeDigitVeryEasy, Cn: "记字入门", RouteType: RouteType5RoundsAvgHT, IsWca: false, Class: []string{ProjectClassDigit}},
-	{Project: NotCubeDigitEasy, Cn: "记字初级", RouteType: RouteType5RoundsAvgHT, IsWca: false, Class: []string{ProjectClassDigit}},
-	{Project: NotCubeDigitModerate, Cn: "记字中级", RouteType: RouteType5RoundsAvgHT, IsWca: false, Class: []string{ProjectClassDigit}},
-	{Project: NotCubeDigitAdvanced, Cn: "记字高级", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassDigit}},
-	{Project: NotCubeDigitHard, Cn: "记字困难", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassDigit}},
-	{Project: NotCubeDigitMaster, Cn: "记字大师", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassDigit}},
-	{Project: NotCubeDigitOnlyNumberVeryEasy, Cn: "记数字入门", RouteType: RouteType5RoundsAvgHT, IsWca: false, Class: []string{ProjectClassDigit}},
-	{Project: NotCubeDigitOnlyNumberEasy, Cn: "记数字初级", RouteType: RouteType5RoundsAvgHT, IsWca: false, Class: []string{ProjectClassDigit}},
-	{Project: NotCubeDigitOnlyNumberModerate, Cn: "记数字中级", RouteType: RouteType5RoundsAvgHT, IsWca: false, Class: []string{ProjectClassDigit}},
-	{Project: NotCubeDigitOnlyNumberAdvanced, Cn: "记数字高级", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassDigit}},
-	{Project: NotCubeDigitOnlyNumberHard, Cn: "记数字困难", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassDigit}},
-	{Project: NotCubeDigitOnlyNumberMaster, Cn: "记数字大师", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassDigit}},
+	{Project: NotCubeDigit, Cn: "记字", RouteType: RouteTypeRepeatedly, IsWca: false, Class: []string{ProjectClassDigit}},
+	{Project: NotCubeDigitOnlyNumber, Cn: "记数字", RouteType: RouteTypeRepeatedly, IsWca: false, Class: []string{ProjectClassDigit}},
 	{Project: NotCubePuke, Cn: "扑克记忆", RouteType: RouteTypeRepeatedly, IsWca: false, Class: []string{ProjectClassDigit}},
 }
 
