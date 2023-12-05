@@ -151,6 +151,8 @@ const (
 	NotCubeDigitOnlyNumberAdvanced Project = "digit_num_advanced"  // 纯数字120个
 	NotCubeDigitOnlyNumberHard     Project = "digit_num_hard"      // 纯数字200个
 	NotCubeDigitOnlyNumberMaster   Project = "digit_num_master"    // 纯数字300个
+
+	NotCubePuke Project = "puke" // 扑克记忆
 )
 
 var projectsItems = []projectItem{
@@ -289,6 +291,7 @@ var projectsItems = []projectItem{
 	{Project: NotCubeDigitOnlyNumberAdvanced, Cn: "记数字高级", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassDigit}},
 	{Project: NotCubeDigitOnlyNumberHard, Cn: "记数字困难", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassDigit}},
 	{Project: NotCubeDigitOnlyNumberMaster, Cn: "记数字大师", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassDigit}},
+	{Project: NotCubePuke, Cn: "扑克记忆", RouteType: RouteTypeRepeatedly, IsWca: false, Class: []string{ProjectClassDigit}},
 }
 
 var projectItemsMap = make(map[Project]projectItem, len(projectsItems))
