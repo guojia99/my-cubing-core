@@ -108,10 +108,12 @@ func (c *Client) parserRelativeSor(players []model.Player, bestSingle, bestAvg m
 
 		var data []RelativeSor
 		for _, val := range playerCache {
-			data = append(data, RelativeSor{
-				Player: val.Player,
-				Sor:    val.Sor,
-			})
+			data = append(
+				data, RelativeSor{
+					Player: val.Player,
+					Sor:    val.Sor,
+				},
+			)
 		}
 		sort.Slice(data, func(i, j int) bool { return data[i].Sor >= data[j].Sor })
 		allPlayerSor[sorKey] = data
@@ -154,18 +156,22 @@ func (c *Client) parserSorSort(players []model.Player, bestSingle, bestAvg map[m
 			a = append(a, SorScore{Player: val.Player, AvgCount: val.AvgCount, AvgProjects: val.AvgProjects})
 		}
 
-		sort.Slice(s, func(i, j int) bool {
-			if s[i].SingleCount == s[j].SingleCount {
-				return s[i].SingleProjects < s[j].SingleProjects
-			}
-			return s[i].SingleCount < s[j].SingleCount
-		})
-		sort.Slice(a, func(i, j int) bool {
-			if a[i].AvgCount == a[j].AvgCount {
-				return a[i].AvgProjects < a[j].AvgProjects
-			}
-			return a[i].AvgCount < a[j].AvgCount
-		})
+		sort.Slice(
+			s, func(i, j int) bool {
+				if s[i].SingleCount == s[j].SingleCount {
+					return s[i].SingleProjects < s[j].SingleProjects
+				}
+				return s[i].SingleCount < s[j].SingleCount
+			},
+		)
+		sort.Slice(
+			a, func(i, j int) bool {
+				if a[i].AvgCount == a[j].AvgCount {
+					return a[i].AvgProjects < a[j].AvgProjects
+				}
+				return a[i].AvgCount < a[j].AvgCount
+			},
+		)
 
 		single[sorKey] = s
 		avg[sorKey] = a
@@ -238,7 +244,7 @@ func (c *Client) getContestBestAvg(contestID uint, past bool) map[model.Project]
 	c.db.Where(conn, contestID).Find(&allScore)
 
 	_, players := c.getContestPlayers(contestID, past)
-	avg, _ := c.getBestByScores(allScore, players)
+	_, avg := c.getBestByScores(allScore, players)
 	return avg
 }
 

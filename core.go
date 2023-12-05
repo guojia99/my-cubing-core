@@ -29,6 +29,7 @@ func NewCore(db *gorm.DB, debug bool, cacheTime time.Duration) Core {
 
 type Core interface {
 	BackToFile() error
+	ReSetRecords() error
 
 	ScoreCore
 	PlayerCore

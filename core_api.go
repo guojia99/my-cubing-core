@@ -31,6 +31,8 @@ func (c *Client) BackToFile() error {
 	return nil
 }
 
+func (c *Client) ReSetRecords() error { return c.resetRecords() }
+
 // score Core
 func (c *Client) AddScore(req AddScoreRequest) error {
 	return c.addScore(req.PlayerID, req.ContestID, req.Project, req.RoundId, req.Result, req.Penalty)

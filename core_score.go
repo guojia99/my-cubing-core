@@ -11,6 +11,72 @@ import (
 	"github.com/guojia99/my-cubing-core/model"
 )
 
+func (c *Client) resetRecords() error {
+	// 获取所有成绩, 时间倒序排序
+	var scores []model.Score
+	c.db.Find(&scores)
+
+	// 维护一个map表, 当前内存中单次最佳和平均进行维护, 后续成绩如果好过之前的, 则记录为一次记录, 然后更新
+	var bestM = make(map[model.Project]model.Score)
+	var avgM = make(map[model.Project]model.Score)
+
+	var records []model.Record
+	for _, score := range scores {
+		best, ok := bestM[score.Project]
+		if !ok { // 首个最佳不作数
+			bestM[score.Project] = score
+			continue
+		}
+		if score.IsBestScore(best) {
+			records = append(
+				records, model.Record{
+					Model: model.Model{
+						CreatedAt: score.CreatedAt,
+					},
+					RType:      model.RecordBySingle,
+					ScoreId:    score.ID,
+					PlayerID:   score.PlayerID,
+					PlayerName: score.PlayerName,
+					ContestID:  score.ContestID,
+				},
+			)
+			bestM[score.Project] = score
+		}
+	}
+	for _, score := range scores {
+		switch score.Project.RouteType() {
+		case model.RouteType1rounds, model.RouteTypeRepeatedly:
+			continue
+		}
+
+		avg, ok := avgM[score.Project]
+		if !ok { // 首个最佳不作数
+			avgM[score.Project] = score
+			continue
+		}
+		if score.IsBestAvgScore(avg) {
+			records = append(
+				records, model.Record{
+					Model: model.Model{
+						CreatedAt: score.CreatedAt,
+					},
+					RType:      model.RecordByAvg,
+					ScoreId:    score.ID,
+					PlayerID:   score.PlayerID,
+					PlayerName: score.PlayerName,
+					ContestID:  score.ContestID,
+				},
+			)
+			avgM[score.Project] = score
+		}
+	}
+
+	if err := c.db.Where("1 = 1").Delete(&model.Record{}).Error; err != nil {
+		return err
+	}
+	return c.db.Save(&records).Error
+}
+
 // addScore 添加一条成绩
 func (c *Client) addScore(playerID uint, contestID uint, project model.Project, roundID uint, result []float64, penalty model.ScorePenalty) (err error) {
 	// 1. 确定比赛是否存在
@@ -113,6 +179,7 @@ func (c *Client) endContestScore(contestID uint) (err error) {
 	thisContestBestSingle, thisContestBestAvg := c.getContestBestSingle(contestID, false), c.getContestBestAvg(contestID, false)
 	oldContestBest, oldContestAvg := c.getContestBestSingle(contestID, true), c.getContestBestAvg(contestID, true)
 
+	// todo  使用 c.resetRecords
 	var records []model.Record
 	for key, score := range thisContestBestSingle {
 		if _, ok := oldContestBest[key]; ok && score.IsBestScore(oldContestBest[key]) {
