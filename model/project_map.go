@@ -139,9 +139,11 @@ const (
 	NotCube80Puzzle Project = "80puzzle"
 
 	// 记字
-	NotCubeDigit           Project = "digit"     // 任意字符
-	NotCubeDigitOnlyNumber Project = "digit_num" // 纯数字20个
-	NotCubePuke            Project = "puke"      // 扑克记忆
+	NotCubeDigit                   Project = "digit"               // 任意字符： 数字 + 大小写字母 + 其他字符
+	NotCubeDigitOnlyNumber         Project = "digit_num"           // 纯数字
+	NotCubeDigitOnlyUppercase      Project = "digit_uppercase"     // 大写字母
+	NotCubeDigitNumberAndUppercase Project = "digit_num_uppercase" // 数字 + 大写字母
+	NotCubePuke                    Project = "puke"                // 扑克记忆
 )
 
 var projectsItems = []projectItem{
@@ -270,6 +272,8 @@ var projectsItems = []projectItem{
 
 	{Project: NotCubeDigit, Cn: "记字", RouteType: RouteTypeRepeatedly, IsWca: false, Class: []string{ProjectClassDigit}},
 	{Project: NotCubeDigitOnlyNumber, Cn: "记数字", RouteType: RouteTypeRepeatedly, IsWca: false, Class: []string{ProjectClassDigit}},
+	{Project: NotCubeDigitOnlyUppercase, Cn: "记字母", RouteType: RouteTypeRepeatedly, IsWca: false, Class: []string{ProjectClassDigit}},
+	{Project: NotCubeDigitNumberAndUppercase, Cn: "记数字字母", RouteType: RouteTypeRepeatedly, IsWca: false, Class: []string{ProjectClassDigit}},
 	{Project: NotCubePuke, Cn: "扑克记忆", RouteType: RouteTypeRepeatedly, IsWca: false, Class: []string{ProjectClassDigit}},
 }
 
