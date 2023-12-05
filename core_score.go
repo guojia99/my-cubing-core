@@ -100,6 +100,9 @@ func (c *Client) addScore(playerID uint, contestID uint, project model.Project, 
 		return err
 	}
 
+	// 3.5 最佳记录
+	bestM, avgM := c.GetAllProjectBestScores()
+
 	// 4. 尝试找到本场比赛成绩, 刷新后保存
 	var score model.Score
 	err = c.db.Model(&model.Score{}).Where("player_id = ?", player.ID).Where("contest_id = ?", contestID).Where("route_id = ?", round.ID).First(&score).Error
@@ -146,7 +149,6 @@ func (c *Client) addScore(playerID uint, contestID uint, project model.Project, 
 	// 6. 查看是否需要刷新记录
 	// - 查询历史最佳成绩
 	var records []model.Record
-	bestM, avgM := c.GetAllProjectBestScores()
 	if best, ok := bestM[score.Project]; ok && score.IsBestScore(best) {
 		// 添加记录, 查看记录是否存在
 		records = append(
@@ -175,22 +177,15 @@ func (c *Client) addScore(playerID uint, contestID uint, project model.Project, 
 			)
 		}
 	}
-
-	var saveRecords []model.Record
-	for _, record := range records {
-		var rc model.Record
-		err = c.db.Where("rtype = ?", record.RType).Where("score_id = ?", record.ScoreId).
-			Where("player_id = ?", record.PlayerID).Where("contest_id = ?", record.ContestID).First(&rc).Error
-		if err != nil || rc.ID == 0 { // 记录不存在
-			saveRecords = append(saveRecords, record)
-			continue
-		}
-		rc.ScoreId = record.ScoreId // 更新
-		saveRecords = append(saveRecords, rc)
+	if err = c.db.Where("player_id = ?", score.PlayerID).Where("contest_id = ?", score.ContestID).Delete(&model.Record{}).Error; err != nil {
+		return err
 	}
-	c.db.Save(&saveRecords)
 
-	return nil
+	if len(records) > 0 {
+		err = c.db.Save(&records).Error
+	}
+
+	return err
 }
 
 // removeScore 删除一条成绩
