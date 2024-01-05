@@ -249,9 +249,9 @@ var projectsItems = []projectItem{
 
 	{Project: XCube133, Cn: "一三三", RouteType: RouteType5RoundsAvgHT, IsWca: false, Class: []string{ProjectClassXCube}},
 	{Project: XCube223, Cn: "二二三", RouteType: RouteType5RoundsAvgHT, IsWca: false, Class: []string{ProjectClassXCube}},
-	{Project: XCube233, Cn: "二三三", RouteType: RouteType3roundsAvg, IsWca: false, Class: []string{ProjectClassXCube}},
-	{Project: XCube334, Cn: "三三四", RouteType: RouteType3roundsAvg, IsWca: false, Class: []string{ProjectClassXCube}},
-	{Project: XCube335, Cn: "三三五", RouteType: RouteType3roundsAvg, IsWca: false, Class: []string{ProjectClassXCube}},
+	{Project: XCube233, Cn: "二三三", RouteType: RouteType5RoundsAvgHT, IsWca: false, Class: []string{ProjectClassXCube}},
+	{Project: XCube334, Cn: "三三四", RouteType: RouteType5RoundsAvgHT, IsWca: false, Class: []string{ProjectClassXCube}},
+	{Project: XCube335, Cn: "三三五", RouteType: RouteType5RoundsAvgHT, IsWca: false, Class: []string{ProjectClassXCube}},
 	{Project: XCube336, Cn: "三三六", RouteType: RouteType3roundsAvg, IsWca: false, Class: []string{ProjectClassXCube}},
 	{Project: XCube337, Cn: "三三七", RouteType: RouteType3roundsAvg, IsWca: false, Class: []string{ProjectClassXCube}},
 
