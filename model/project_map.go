@@ -40,14 +40,15 @@ const (
 	XCube222Fm   Project = "222fm"
 
 	// 盲
-	XCube222BF   Project = "222bf"
-	XCube666BF   Project = "666bf"
-	XCube777BF   Project = "777bf"
-	XCubePyBF    Project = "pyram_bf"
-	XCubeSkBF    Project = "skewb_bf"
-	XCubeMinxBf  Project = "minx_bf"
-	XCubeClockBf Project = "clock_bf"
-	XCubeSQ1Bf   Project = "sq1_bf"
+	XCube333MBFUnlimited Project = "333mbf_unlimited"
+	XCube222BF           Project = "222bf"
+	XCube666BF           Project = "666bf"
+	XCube777BF           Project = "777bf"
+	XCubePyBF            Project = "pyram_bf"
+	XCubeSkBF            Project = "skewb_bf"
+	XCubeMinxBf          Project = "minx_bf"
+	XCubeClockBf         Project = "clock_bf"
+	XCubeSQ1Bf           Project = "sq1_bf"
 
 	// 单手
 	XCube333BfOH   Project = "333bf_oh" // 三单盲
@@ -167,13 +168,13 @@ var projectsItems = []projectItem{
 	{Project: Cube444BF, Cn: "四盲", RouteType: RouteType3roundsBest, IsWca: true, Class: []string{ProjectClassWCA, ProjectClassWCABF}},
 	{Project: Cube555BF, Cn: "五盲", RouteType: RouteType3roundsBest, IsWca: true, Class: []string{ProjectClassWCA, ProjectClassWCABF}},
 	{Project: Cube333MBF, Cn: "多盲", RouteType: RouteTypeRepeatedly, IsWca: true, Class: []string{ProjectClassWCA, ProjectClassWCABF}},
-	{Project: Cube333Ft, Cn: "脚拧", RouteType: RouteType5RoundsAvgHT, IsWca: true, Class: []string{ProjectClassWCA}},
 
 	{Project: XCubePyFm, Cn: "塔少步", RouteType: RouteType3roundsAvg, IsWca: false, Class: []string{ProjectClassXCubeFm}},
 	{Project: XCubeSkFm, Cn: "斜少步", RouteType: RouteType3roundsAvg, IsWca: false, Class: []string{ProjectClassXCubeFm}},
 	{Project: XCube222Fm, Cn: "二少步", RouteType: RouteType3roundsAvg, IsWca: false, Class: []string{ProjectClassXCubeFm}},
 	{Project: XCubeClockFm, Cn: "表少步", RouteType: RouteType3roundsAvg, IsWca: false, Class: []string{ProjectClassXCubeFm}},
 
+	{Project: XCube333MBFUnlimited, Cn: "无限多盲", RouteType: RouteTypeRepeatedly, IsWca: false, Class: []string{ProjectClassXCubeBF}},
 	{Project: XCube222BF, Cn: "二盲", RouteType: RouteType5roundsBest, IsWca: false, Class: []string{ProjectClassXCubeBF}},
 	{Project: XCube666BF, Cn: "六盲", RouteType: RouteType1rounds, IsWca: false, Class: []string{ProjectClassXCubeBF}},
 	{Project: XCube777BF, Cn: "七盲", RouteType: RouteType1rounds, IsWca: false, Class: []string{ProjectClassXCubeBF}},
@@ -218,6 +219,7 @@ var projectsItems = []projectItem{
 	{Project: XCube27AlienRelayAll, Cn: "全项目连拧", RouteType: RouteType1rounds, IsWca: false, Class: []string{ProjectClassXCubeRelay}},
 	{Project: XCube27AlienOHRelayAll, Cn: "全项目单手连", RouteType: RouteType1rounds, IsWca: false, Class: []string{ProjectClassXCubeRelay}},
 
+	{Project: Cube333Ft, Cn: "脚拧", RouteType: RouteType5RoundsAvgHT, IsWca: false, Class: []string{ProjectClassXCube}},
 	{Project: XCube333Mirror, Cn: "镜面魔方", RouteType: RouteType5RoundsAvgHT, IsWca: false, Class: []string{ProjectClassXCube}},
 	{Project: XCube333Mirroring, Cn: "镜向三阶", RouteType: RouteType5RoundsAvgHT, IsWca: false, Class: []string{ProjectClassXCube}},
 	{Project: XCube333Mini, Cn: "三阶迷你", RouteType: RouteType5RoundsAvgHT, IsWca: false, Class: []string{ProjectClassXCube}},
