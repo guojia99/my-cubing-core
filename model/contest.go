@@ -24,6 +24,7 @@ type Contest struct {
 
 	Name        string    `json:"Name,omitempty" gorm:"unique;not null;column:name"`        // 比赛名
 	Type        string    `json:"Type,omitempty" gorm:"column:c_type"`                      // 类型 正式 | 线上 | 线下
+	GroupID     string    `json:"GroupID,omitempty" gorm:"column:group_id"`                 // 线上群赛ID
 	Description string    `json:"Description,omitempty" gorm:"not null;column:description"` // 描述
 	IsEnd       bool      `json:"IsEnd,omitempty" gorm:"null;column:is_end"`                // 是否已结束
 	RoundIds    string    `json:"RoundIds,omitempty" gorm:"column:round_ids"`               // 轮次ID

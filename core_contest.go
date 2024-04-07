@@ -12,15 +12,17 @@ import (
 var defaultProjectRounds = func() []CreateContestRequestRound {
 	var out []CreateContestRequestRound
 	for _, p := range model.WCAProjectRoute() {
-		out = append(out, CreateContestRequestRound{
-			Project: p,
-			Number:  1,
-			Name:    fmt.Sprintf("%s单轮赛", p.Cn()),
-			Part:    1,
-			IsStart: true,
-			Final:   true,
-			Upsets:  []string{},
-		})
+		out = append(
+			out, CreateContestRequestRound{
+				Project: p,
+				Number:  1,
+				Name:    fmt.Sprintf("%s单轮赛", p.Cn()),
+				Part:    1,
+				IsStart: true,
+				Final:   true,
+				Upsets:  []string{},
+			},
+		)
 	}
 	return out
 }()
@@ -35,6 +37,7 @@ func (c *Client) addContest(req AddContestRequest) error {
 	contest = model.Contest{
 		Name:        req.Name,
 		Description: req.Description,
+		GroupID:     req.GroupID,
 		Type:        req.Type,
 		StartTime: func() time.Time {
 			if req.StartTime == 0 {
@@ -205,11 +208,13 @@ func (c *Client) getContestScore(contestID uint) map[model.Project][]RoutesScore
 		if _, ok := out[pj]; !ok {
 			out[pj] = make([]RoutesScores, 0)
 		}
-		out[pj] = append(out[pj], RoutesScores{
-			Final:  rs[0].Final,
-			Round:  rs,
-			Scores: scores,
-		})
+		out[pj] = append(
+			out[pj], RoutesScores{
+				Final:  rs[0].Final,
+				Round:  rs,
+				Scores: scores,
+			},
+		)
 	}
 
 	for _, pj := range model.AllProjectRoute() {
@@ -271,12 +276,14 @@ func (c *Client) getContestRecord(contestID uint) []RecordMessage {
 		_ = c.db.First(&player, "id = ?", record.PlayerID).Error
 		_ = c.db.First(&score, "id = ?", record.ScoreId).Error
 
-		out = append(out, RecordMessage{
-			Record:  record,
-			Player:  player,
-			Score:   score,
-			Contest: contest,
-		})
+		out = append(
+			out, RecordMessage{
+				Record:  record,
+				Player:  player,
+				Score:   score,
+				Contest: contest,
+			},
+		)
 	}
 	return out
 }
@@ -292,11 +299,13 @@ func (c *Client) getAllContestStatics() (out []ContestStatics) {
 		var projects []model.Project
 		c.db.Model(&model.Score{}).Distinct("project").Where("contest_id = ?", contest.ID).Pluck("project", &projects)
 
-		out = append(out, ContestStatics{
-			Contest:    contest,
-			PlayerNum:  len(playerIDs),
-			ProjectNum: len(projects),
-		})
+		out = append(
+			out, ContestStatics{
+				Contest:    contest,
+				PlayerNum:  len(playerIDs),
+				ProjectNum: len(projects),
+			},
+		)
 	}
 	return out
 }

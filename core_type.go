@@ -37,6 +37,7 @@ type (
 	AddContestRequest struct {
 		Name        string                      `json:"Name"`
 		Description string                      `json:"Description"`
+		GroupID     string                      `json:"GroupID"`
 		Rounds      []CreateContestRequestRound `json:"Rounds"`
 		Type        string                      `json:"Type"`
 		StartTime   int64                       `json:"StartTime"`
@@ -109,15 +110,17 @@ type SorScore struct {
 }
 
 func SortPodiums(in []Podiums) {
-	sort.Slice(in, func(i, j int) bool {
-		if in[i].Gold == in[j].Gold {
-			if in[i].Silver == in[j].Silver {
-				return in[i].Bronze > in[j].Bronze
+	sort.Slice(
+		in, func(i, j int) bool {
+			if in[i].Gold == in[j].Gold {
+				if in[i].Silver == in[j].Silver {
+					return in[i].Bronze > in[j].Bronze
+				}
+				return in[i].Silver > in[j].Silver
 			}
-			return in[i].Silver > in[j].Silver
-		}
-		return in[i].Gold > in[j].Gold
-	})
+			return in[i].Gold > in[j].Gold
+		},
+	)
 }
 
 type RecordMessage struct {
