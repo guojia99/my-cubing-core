@@ -23,6 +23,7 @@ const (
 	ProjectClassNotCube    = "趣味非魔方"
 	ProjectClassDigit      = "记字"
 	ProjectClassSuperHigh  = "超高阶"
+	ProjectClassBFGroup    = "盲拧群系列"
 )
 
 var ProjectClassList = []ProjectClass{
@@ -38,6 +39,7 @@ var ProjectClassList = []ProjectClass{
 	ProjectClassNotCube,
 	ProjectClassDigit,
 	ProjectClassSuperHigh,
+	ProjectClassBFGroup,
 }
 
 const (

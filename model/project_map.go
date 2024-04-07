@@ -145,6 +145,30 @@ const (
 	NotCubeDigitOnlyUppercase      Project = "digit_uppercase"     // 大写字母
 	NotCubeDigitNumberAndUppercase Project = "digit_num_uppercase" // 数字 + 大写字母
 	NotCubePuke                    Project = "puke"                // 扑克记忆
+
+	// 盲拧群周系列赛
+	BFGroup333BF1 Project = "3bf1"
+	BFGroup333BF2 Project = "3bf2"
+	BFGroup333BF3 Project = "3bf3"
+	BFGroup333BF4 Project = "3bf4"
+	BFGroup333BF5 Project = "3bf5"
+	BFGroup333BF6 Project = "3bf6"
+	BFGroup333BF7 Project = "3bf7"
+
+	BFGroup444BF1 Project = "4bf1"
+	BFGroup444BF2 Project = "4bf2"
+	BFGroup444BF3 Project = "4bf3"
+	BFGroup444BF4 Project = "4bf4"
+
+	BFGroup555BF1 Project = "5bf1"
+	BFGroup555BF2 Project = "5bf2"
+	BFGroup555BF3 Project = "5bf3"
+	BFGroup555BF4 Project = "5bf4"
+
+	BFGroup333MBF1 Project = "3mbf1"
+	BFGroup333MBF2 Project = "3mbf2"
+	BFGroup333MBF3 Project = "3mbf3"
+	BFGroup333MBF4 Project = "3mbf4"
 )
 
 var projectsItems = []projectItem{
@@ -277,6 +301,27 @@ var projectsItems = []projectItem{
 	{Project: NotCubeDigitOnlyUppercase, Cn: "记字母", RouteType: RouteTypeRepeatedly, IsWca: false, Class: []string{ProjectClassDigit}},
 	{Project: NotCubeDigitNumberAndUppercase, Cn: "记数字字母", RouteType: RouteTypeRepeatedly, IsWca: false, Class: []string{ProjectClassDigit}},
 	{Project: NotCubePuke, Cn: "扑克记忆", RouteType: RouteTypeRepeatedly, IsWca: false, Class: []string{ProjectClassDigit}},
+
+	// 盲拧群赛系列
+	{Project: BFGroup333BF1, Cn: "盲拧系列三盲1", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassBFGroup}},
+	{Project: BFGroup333BF2, Cn: "盲拧系列三盲2", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassBFGroup}},
+	{Project: BFGroup333BF3, Cn: "盲拧系列三盲3", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassBFGroup}},
+	{Project: BFGroup333BF4, Cn: "盲拧系列三盲4", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassBFGroup}},
+	{Project: BFGroup333BF5, Cn: "盲拧系列三盲5", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassBFGroup}},
+	{Project: BFGroup333BF6, Cn: "盲拧系列三盲6", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassBFGroup}},
+	{Project: BFGroup333BF7, Cn: "盲拧系列三盲7", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassBFGroup}},
+	{Project: BFGroup444BF1, Cn: "盲拧系列四盲1", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassBFGroup}},
+	{Project: BFGroup444BF2, Cn: "盲拧系列四盲2", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassBFGroup}},
+	{Project: BFGroup444BF3, Cn: "盲拧系列四盲3", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassBFGroup}},
+	{Project: BFGroup444BF4, Cn: "盲拧系列四盲4", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassBFGroup}},
+	{Project: BFGroup555BF1, Cn: "盲拧系列四盲1", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassBFGroup}},
+	{Project: BFGroup555BF2, Cn: "盲拧系列四盲2", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassBFGroup}},
+	{Project: BFGroup555BF3, Cn: "盲拧系列四盲3", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassBFGroup}},
+	{Project: BFGroup555BF4, Cn: "盲拧系列四盲4", RouteType: RouteType3roundsBest, IsWca: false, Class: []string{ProjectClassBFGroup}},
+	{Project: BFGroup333MBF1, Cn: "盲拧系列多盲1", RouteType: RouteTypeRepeatedly, IsWca: false, Class: []string{ProjectClassBFGroup}},
+	{Project: BFGroup333MBF2, Cn: "盲拧系列多盲2", RouteType: RouteTypeRepeatedly, IsWca: false, Class: []string{ProjectClassBFGroup}},
+	{Project: BFGroup333MBF3, Cn: "盲拧系列多盲3", RouteType: RouteTypeRepeatedly, IsWca: false, Class: []string{ProjectClassBFGroup}},
+	{Project: BFGroup333MBF4, Cn: "盲拧系列多盲4", RouteType: RouteTypeRepeatedly, IsWca: false, Class: []string{ProjectClassBFGroup}},
 }
 
 var projectItemsMap = make(map[Project]projectItem, len(projectsItems))
