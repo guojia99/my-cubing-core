@@ -184,9 +184,6 @@ func (s *Score) IsBestScore(other Score) bool {
 		}
 		return s.Best > other.Best
 	default:
-		if s.Best == other.Best {
-			return s.Avg <= other.Avg
-		}
 		return s.Best <= other.Best
 	}
 }
