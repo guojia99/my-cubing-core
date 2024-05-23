@@ -313,6 +313,37 @@ func (c *Client) getBestByScores(allScore []model.Score, players []model.Player)
 	return
 }
 
+// getBestByScoresMuil 获取头部成绩， 且头部成绩有多个
+func (c *Client) getBestByScoresMuil(allScore []model.Score, players []model.Player) (bestSingle, bestAvg map[model.Project][]model.Score) {
+	bestSingles, bestAvgs := c.sortByScores(allScore, players)
+	bestSingle, bestAvg = make(map[model.Project][]model.Score), make(map[model.Project][]model.Score)
+
+	for _, pj := range model.AllProjectRoute() {
+		if val, ok := bestSingles[pj]; ok && len(val) > 0 {
+			var sco []model.Score
+			sco = append(sco, val[0])
+			for i := 1; i < len(sco); i++ {
+				if val[i].IsBestScore(sco[0]) {
+					sco = append(sco, val[i])
+				}
+			}
+			bestSingles[pj] = sco
+		}
+
+		if val, ok := bestAvgs[pj]; ok && len(val) > 0 {
+			var sco []model.Score
+			sco = append(sco, val[0])
+			for i := 1; i < len(sco); i++ {
+				if val[i].IsBestAvgScore(sco[0]) {
+					sco = append(sco, val[i])
+				}
+			}
+			bestAvgs[pj] = sco
+		}
+	}
+	return
+}
+
 // getContestAllBestScores 获取某比赛所有最佳成绩排名
 func (c *Client) getContestAllBestScores(contestID uint) (bestSingle, bestAvg map[model.Project][]model.Score) {
 	playerIDs, players := c.getContestPlayers(contestID, false)
