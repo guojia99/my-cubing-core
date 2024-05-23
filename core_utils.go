@@ -322,23 +322,23 @@ func (c *Client) getBestByScoresMuil(allScore []model.Score, players []model.Pla
 		if val, ok := bestSingles[pj]; ok && len(val) > 0 {
 			var sco []model.Score
 			sco = append(sco, val[0])
-			for i := 1; i < len(sco); i++ {
+			for i := 1; i < len(val); i++ {
 				if val[i].IsBestScore(sco[0]) {
 					sco = append(sco, val[i])
 				}
 			}
-			bestSingles[pj] = sco
+			bestSingle[pj] = sco
 		}
 
 		if val, ok := bestAvgs[pj]; ok && len(val) > 0 {
 			var sco []model.Score
 			sco = append(sco, val[0])
-			for i := 1; i < len(sco); i++ {
+			for i := 1; i < len(val); i++ {
 				if val[i].IsBestAvgScore(sco[0]) {
 					sco = append(sco, val[i])
 				}
 			}
-			bestAvgs[pj] = sco
+			bestAvg[pj] = sco
 		}
 	}
 	return

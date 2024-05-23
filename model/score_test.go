@@ -85,19 +85,21 @@ func TestScore_SetResult1(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &Score{
-				Project: tt.fields.Project,
-			}
-			s.SetResult(tt.args.in, tt.args.penalty)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				s := &Score{
+					Project: tt.fields.Project,
+				}
+				s.SetResult(tt.args.in, tt.args.penalty)
 
-			if s.Avg != tt.wantAvg {
-				t.Errorf("got Avg %f error, want %f", s.Avg, tt.wantAvg)
-			}
-			if s.Best != tt.wantBest {
-				t.Errorf("got Best %f error, want %f", s.Best, tt.wantBest)
-			}
-		})
+				if s.Avg != tt.wantAvg {
+					t.Errorf("got Avg %f error, want %f", s.Avg, tt.wantAvg)
+				}
+				if s.Best != tt.wantBest {
+					t.Errorf("got Best %f error, want %f", s.Best, tt.wantBest)
+				}
+			},
+		)
 	}
 }
 
@@ -129,4 +131,19 @@ func TestSortScores(t *testing.T) {
 	for _, val := range scores {
 		fmt.Println(val.Best, val.Avg)
 	}
+}
+
+func TestScore_IsBestScore(t *testing.T) {
+
+	score1 := Score{
+		Project: Cube333FM,
+	}
+	score1.SetResult([]float64{16, 21, 22}, ScorePenalty{})
+	score2 := Score{
+		Project: Cube333FM,
+	}
+	score2.SetResult([]float64{16, 22, 21}, ScorePenalty{})
+
+	fmt.Println(score1.IsBestScore(score2))
+	fmt.Println(score2.IsBestScore(score1))
 }

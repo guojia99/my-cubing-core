@@ -52,8 +52,8 @@ func (c *Client) resetRecords() error {
 			continue
 		}
 		best, avg := b[0], b[1]
-		for pj, scores := range best {
-			for _, score := range scores {
+		for pj, scoresC := range best {
+			for _, score := range scoresC {
 				oldBest, ok := bestM[pj]
 				if !ok { // 首个最佳不作数
 					bestM[score.Project] = score
@@ -76,8 +76,8 @@ func (c *Client) resetRecords() error {
 				}
 			}
 		}
-		for pj, scores := range avg {
-			for _, score := range scores {
+		for pj, scoresC := range avg {
+			for _, score := range scoresC {
 				switch score.Project.RouteType() {
 				case model.RouteType1rounds, model.RouteTypeRepeatedly:
 					continue
@@ -107,10 +107,8 @@ func (c *Client) resetRecords() error {
 		}
 
 	}
-
-	if err := c.db.Where("1 = 1").Delete(&model.Record{}).Error; err != nil {
-		return err
-	}
+	fmt.Println(len(records))
+	_ = c.db.Unscoped().Where("1 = 1").Delete(&model.Record{})
 	return c.db.Save(&records).Error
 }
 
