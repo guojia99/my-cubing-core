@@ -69,15 +69,17 @@ func (s *Score) SetResult(in []float64, penalty ScorePenalty) {
 			s.Result3+float64(len(penalty.R3)*2)
 
 		cache := []float64{in[0], in[1], in[2]}
-		sort.Slice(cache, func(i, j int) bool {
-			if cache[i] <= DNF {
-				return false
-			}
-			if cache[j] <= DNF {
-				return true
-			}
-			return cache[i] < cache[j]
-		})
+		sort.Slice(
+			cache, func(i, j int) bool {
+				if cache[i] <= DNF {
+					return false
+				}
+				if cache[j] <= DNF {
+					return true
+				}
+				return cache[i] < cache[j]
+			},
+		)
 		for i := 0; i < len(cache); i++ {
 			if cache[i] <= DNF {
 				continue
@@ -97,15 +99,17 @@ func (s *Score) SetResult(in []float64, penalty ScorePenalty) {
 			s.Result5+float64(len(penalty.R5)*2)
 
 		cache := in
-		sort.Slice(cache, func(i, j int) bool {
-			if cache[i] <= DNF {
-				return false
-			}
-			if cache[j] <= DNF {
-				return true
-			}
-			return cache[i] < cache[j]
-		})
+		sort.Slice(
+			cache, func(i, j int) bool {
+				if cache[i] <= DNF {
+					return false
+				}
+				if cache[j] <= DNF {
+					return true
+				}
+				return cache[i] < cache[j]
+			},
+		)
 
 		for i := 0; i < len(cache); i++ {
 			if cache[i] <= DNF {
@@ -163,6 +167,9 @@ func (s *Score) D() int {
 }
 
 func (s *Score) IsBestScore(other Score) bool {
+	if s.DBest() || other.DBest() {
+		return !s.DBest()
+	}
 	switch s.Project.RouteType() {
 	case RouteTypeRepeatedly:
 		// blind cube special rules:
@@ -172,21 +179,15 @@ func (s *Score) IsBestScore(other Score) bool {
 		// - sort priority： r1 > r2 > r3
 		// - like: if r1 and r2 equal, the best r3 is rank the top.
 
-		if s.DBest() || other.DBest() {
-			return !s.DBest()
-		}
 		if s.Best == other.Best {
-			return s.Result3 < other.Result3
+			return s.Result3 <= other.Result3
 		}
 		return s.Best > other.Best
 	default:
-		if s.DBest() || other.DBest() {
-			return !s.DBest()
-		}
 		if s.Best == other.Best {
-			return s.Avg < other.Avg
+			return s.Avg <= other.Avg
 		}
-		return s.Best < other.Best
+		return s.Best <= other.Best
 	}
 }
 
@@ -201,7 +202,7 @@ func (s *Score) IsBestAvgScore(other Score) bool {
 		if s.DAvg() && other.DAvg() {
 			return s.IsBestScore(other)
 		}
-		return s.Avg < other.Avg
+		return s.Avg <= other.Avg
 	}
 }
 
@@ -212,21 +213,23 @@ func SortScores(in []Score) {
 	}
 
 	ro := in[0].Project.RouteType()
-	sort.Slice(in, func(i, j int) bool {
-		switch ro {
-		case RouteType1rounds, RouteType3roundsBest, RouteType5roundsBest, RouteTypeRepeatedly:
-			return in[i].IsBestScore(in[j])
-		case RouteType3roundsAvg, RouteType5roundsAvg, RouteType5RoundsAvgHT:
-			if in[i].DAvg() && in[j].DAvg() {
+	sort.Slice(
+		in, func(i, j int) bool {
+			switch ro {
+			case RouteType1rounds, RouteType3roundsBest, RouteType5roundsBest, RouteTypeRepeatedly:
 				return in[i].IsBestScore(in[j])
+			case RouteType3roundsAvg, RouteType5roundsAvg, RouteType5RoundsAvgHT:
+				if in[i].DAvg() && in[j].DAvg() {
+					return in[i].IsBestScore(in[j])
+				}
+				if in[i].DAvg() || in[j].DAvg() {
+					return !in[i].DAvg()
+				}
+				return in[i].IsBestAvgScore(in[j])
 			}
-			if in[i].DAvg() || in[j].DAvg() {
-				return !in[i].DAvg()
-			}
-			return in[i].IsBestAvgScore(in[j])
-		}
-		return true
-	})
+			return true
+		},
+	)
 
 	// add rank in scores, the identical score rank number equal.
 	in[0].Rank = 1
